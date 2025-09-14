@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Assistant DFFM</title>
+    <meta charset="utf-8">
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d30;
+            --bg-tertiary: #3c3c3c;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --accent: #007acc;
+            --accent-hover: #005a9e;
+            --border: #404040;
+            --success: #4caf50;
+            --warning: #ff9800;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; 
+            padding: 20px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: var(--bg-secondary); 
+            padding: 30px; 
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        h1 { 
+            margin: 0; 
+            color: var(--accent);
+            font-size: 2.2em;
+            font-weight: 300;
+        }
+        
+        .language-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .lang-btn:hover, .lang-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        .section { 
+            margin-bottom: 30px; 
+            padding: 25px; 
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border); 
+            border-radius: 8px;
+        }
+        
+        .section h2 {
+            margin-top: 0;
+            color: var(--text-primary);
+            font-weight: 400;
+            font-size: 1.4em;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+        
+        textarea { 
+            width: 100%; 
+            height: 120px; 
+            margin: 15px 0; 
+            padding: 15px; 
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .model-select { 
+            width: 100%;
+            padding: 12px 15px; 
+            margin: 15px 0; 
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        button { 
+            padding: 12px 24px; 
+            background: var(--accent); 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover { 
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        button:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .output { 
+            background: var(--bg-primary); 
+            padding: 20px; 
+            margin-top: 15px; 
+            border-left: 4px solid var(--accent); 
+            white-space: pre-wrap; 
+            max-height: 500px; 
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            border-radius: 4px;
+        }
+        
+        .status { 
+            padding: 15px; 
+            background: linear-gradient(135deg, var(--success), #45a049); 
+            border-radius: 6px; 
+            margin: 20px 0;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .loading {
+            color: var(--warning);
+            font-style: italic;
+        }
+        
+        .error {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #ff6b6b;
+        }
+        
+        .quick-prompts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .quick-prompt {
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-prompt:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .header { flex-direction: column; gap: 15px; }
+            h1 { font-size: 1.8em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Assistant DFFM</h1>
+            <div class="language-controls">
+                <button class="lang-btn active" onclick="setLanguage('it')" data-lang="it">Italiano</button>
+                <button class="lang-btn" onclick="setLanguage('en')" data-lang="en">English</button>
+            </div>
+        </div>
+        
+        <div class="status" id="status">
+            <strong>Status:</strong> <span id="status-text">Caricamento...</span>
+        </div>
+        
+        
+        
+        <div class="section">
+            <h2>📚 Gestione Versioni Documenti</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <h3>Progetti Esistenti</h3>
+                    <div id="projects-list" style="max-height: 200px; overflow-y: auto; background: var(--bg-primary); padding: 10px; border-radius: 4px;"></div>
+                    <button onclick="loadProjects()">Aggiorna Progetti</button>
+                </div>
+                
+                <div>
+                    <h3>Nuovo Progetto</h3>
+                    <input type="text" id="new-project-name" placeholder="Nome progetto" style="width: 100%; margin: 5px 0; padding: 8px;">
+                    <input type="text" id="new-project-desc" placeholder="Descrizione" style="width: 100%; margin: 5px 0; padding: 8px;">
+                    <button onclick="createProject()">Crea Progetto</button>
+                </div>
+            </div>
+            
+            <div style="border-top: 1px solid var(--border); padding-top: 20px;">
+                <h3>Salva Documenti con Versioning</h3>
+                <select id="project-select" style="width: 100%; margin: 10px 0; padding: 8px;">
+                    <option value="">Seleziona progetto...</option>
+                </select>
+                <textarea id="document-content" placeholder="Incolla qui il contenuto del documento generato dall'AI per salvarlo con versioning..." style="height: 150px;"></textarea>
+                <input type="text" id="commit-message" placeholder="Messaggio di commit (es: Aggiunta configurazione OPC UA)" style="width: 100%; margin: 10px 0; padding: 8px;">
+                <button onclick="saveDocument()">Salva Versione</button>
+            </div>
+            
+            <div style="border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px;">
+                <h3>Cronologia Versioni</h3>
+                <select id="history-project-select" style="width: 100%; margin: 10px 0; padding: 8px;" onchange="loadVersionHistory()">
+                    <option value="">Seleziona progetto per cronologia...</option>
+                </select>
+                <div id="version-history" class="output" style="max-height: 300px;"></div>
+                
+                <div style="margin-top: 15px;">
+                    <h4>Confronta Versioni</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: end;">
+                        <select id="compare-version-a" style="padding: 8px;">
+                            <option value="">Versione A...</option>
+                        </select>
+                        <select id="compare-version-b" style="padding: 8px;">
+                            <option value="">Versione B...</option>
+                        </select>
+                        <button onclick="compareVersions()">Confronta</button>
+                    </div>
+                    <div id="version-diff" class="output" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📚 Gestione Versioni Documenti</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <h3>Progetti Esistenti</h3>
+                    <div id="projects-list" style="max-height: 200px; overflow-y: auto; background: var(--bg-primary); padding: 10px; border-radius: 4px;"></div>
+                    <button onclick="loadProjects()">Aggiorna Progetti</button>
+                </div>
+                
+                <div>
+                    <h3>Nuovo Progetto</h3>
+                    <input type="text" id="new-project-name" placeholder="Nome progetto" style="width: 100%; margin: 5px 0; padding: 8px;">
+                    <input type="text" id="new-project-desc" placeholder="Descrizione" style="width: 100%; margin: 5px 0; padding: 8px;">
+                    <button onclick="createProject()">Crea Progetto</button>
+                </div>
+            </div>
+            
+            <div style="border-top: 1px solid var(--border); padding-top: 20px;">
+                <h3>Salva Documenti con Versioning</h3>
+                <select id="project-select" style="width: 100%; margin: 10px 0; padding: 8px;">
+                    <option value="">Seleziona progetto...</option>
+                </select>
+                <textarea id="document-content" placeholder="Incolla qui il contenuto del documento generato dall'AI per salvarlo con versioning..." style="height: 150px;"></textarea>
+                <input type="text" id="commit-message" placeholder="Messaggio di commit (es: Aggiunta configurazione OPC UA)" style="width: 100%; margin: 10px 0; padding: 8px;">
+                <button onclick="saveDocument()">Salva Versione</button>
+            </div>
+            
+            <div style="border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px;">
+                <h3>Cronologia Versioni</h3>
+                <select id="history-project-select" style="width: 100%; margin: 10px 0; padding: 8px;" onchange="loadVersionHistory()">
+                    <option value="">Seleziona progetto per cronologia...</option>
+                </select>
+                <div id="version-history" class="output" style="max-height: 300px;"></div>
+                
+                <div style="margin-top: 15px;">
+                    <h4>Confronta Versioni</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: end;">
+                        <select id="compare-version-a" style="padding: 8px;">
+                            <option value="">Versione A...</option>
+                        </select>
+                        <select id="compare-version-b" style="padding: 8px;">
+                            <option value="">Versione B...</option>
+                        </select>
+                        <button onclick="compareVersions()">Confronta</button>
+                    </div>
+                    <div id="version-diff" class="output" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        // Versioning functions
+        let currentProjects = [];
+        
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/projects');
+                const data = await response.json();
+                currentProjects = data.projects || [];
+                
+                const projectsList = document.getElementById('projects-list');
+                const projectSelect = document.getElementById('project-select');
+                const historySelect = document.getElementById('history-project-select');
+                
+                projectsList.innerHTML = '';
+                projectSelect.innerHTML = '<option value="">Seleziona progetto...</option>';
+                historySelect.innerHTML = '<option value="">Seleziona progetto per cronologia...</option>';
+                
+                currentProjects.forEach(project => {
+                    // Lista progetti
+                    const div = document.createElement('div');
+                    div.style.cssText = 'margin: 5px 0; padding: 8px; background: var(--bg-secondary); border-radius: 4px; font-size: 0.9em;';
+                    div.innerHTML = `
+                        <strong>${project.name}</strong> v${project.current_version}<br>
+                        <small style="color: var(--text-secondary);">${project.description}</small>
+                    `;
+                    projectsList.appendChild(div);
+                    
+                    // Selectors
+                    const option1 = document.createElement('option');
+                    option1.value = project.name;
+                    option1.textContent = `${project.name} (v${project.current_version})`;
+                    projectSelect.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = project.name;
+                    option2.textContent = `${project.name} (v${project.current_version})`;
+                    historySelect.appendChild(option2);
+                });
+            } catch (e) {
+                document.getElementById('projects-list').textContent = 'Errore caricamento progetti';
+            }
+        }
+        
+        async function createProject() {
+            const name = document.getElementById('new-project-name').value;
+            const description = document.getElementById('new-project-desc').value;
+            
+            if (!name) {
+                alert('Inserisci nome progetto');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, description})
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('new-project-name').value = '';
+                    document.getElementById('new-project-desc').value = '';
+                    loadProjects();
+                } else {
+                    alert(result.error);
+                }
+            } catch (e) {
+                alert('Errore creazione progetto');
+            }
+        }
+        
+        async function saveDocument() {
+            const projectName = document.getElementById('project-select').value;
+            const content = document.getElementById('document-content').value;
+            const message = document.getElementById('commit-message').value;
+            
+            if (!projectName || !content) {
+                alert('Seleziona progetto e inserisci contenuto');
+                return;
+            }
+            
+            const files = {
+                'document.md': content
+            };
+            
+            try {
+                const response = await fetch(`/api/projects/${projectName}/save`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        files,
+                        message: message || 'Documento salvato da AI Assistant'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Documento salvato come ${result.version}`);
+                    document.getElementById('document-content').value = '';
+                    document.getElementById('commit-message').value = '';
+                    loadProjects();
+                } else {
+                    alert(result.error);
+                }
+            } catch (e) {
+                alert('Errore salvataggio documento');
+            }
+        }
+        
+        async function loadVersionHistory() {
+            const projectName = document.getElementById('history-project-select').value;
+            
+            if (!projectName) {
+                document.getElementById('version-history').textContent = '';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/projects/${projectName}/versions`);
+                const data = await response.json();
+                
+                const historyDiv = document.getElementById('version-history');
+                const compareA = document.getElementById('compare-version-a');
+                const compareB = document.getElementById('compare-version-b');
+                
+                compareA.innerHTML = '<option value="">Versione A...</option>';
+                compareB.innerHTML = '<option value="">Versione B...</option>';
+                
+                if (data.versions && data.versions.length > 0) {
+                    let historyText = `Cronologia versioni (${data.versions.length}):\n\n`;
+                    
+                    data.versions.reverse().forEach(version => {
+                        historyText += `• ${version.version} - ${version.timestamp}\n`;
+                        historyText += `  ${version.commit_message}\n`;
+                        historyText += `  Hash: ${version.hash} | Files: ${version.files.length}\n\n`;
+                        
+                        // Populate compare selectors
+                        const optionA = document.createElement('option');
+                        optionA.value = version.version;
+                        optionA.textContent = version.version;
+                        compareA.appendChild(optionA);
+                        
+                        const optionB = document.createElement('option');
+                        optionB.value = version.version;
+                        optionB.textContent = version.version;
+                        compareB.appendChild(optionB);
+                    });
+                    
+                    historyDiv.textContent = historyText;
+                } else {
+                    historyDiv.textContent = 'Nessuna versione trovata';
+                }
+            } catch (e) {
+                document.getElementById('version-history').textContent = 'Errore caricamento cronologia';
+            }
+        }
+        
+        async function compareVersions() {
+            const projectName = document.getElementById('history-project-select').value;
+            const versionA = document.getElementById('compare-version-a').value;
+            const versionB = document.getElementById('compare-version-b').value;
+            
+            if (!projectName || !versionA || !versionB) {
+                alert('Seleziona progetto e due versioni da confrontare');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/projects/${projectName}/diff/${versionA}/${versionB}`);
+                const diff = await response.json();
+                
+                const diffDiv = document.getElementById('version-diff');
+                
+                if (diff.error) {
+                    diffDiv.textContent = diff.error;
+                    return;
+                }
+                
+                let diffText = `Confronto ${versionA} → ${versionB}:\n\n`;
+                
+                if (diff.added.length > 0) {
+                    diffText += `✅ Files aggiunti (${diff.added.length}): ${diff.added.join(', ')}\n`;
+                }
+                
+                if (diff.modified.length > 0) {
+                    diffText += `📝 Files modificati (${diff.modified.length}): ${diff.modified.join(', ')}\n`;
+                    Object.entries(diff.changes).forEach(([file, changes]) => {
+                        diffText += `  - ${file}: ${changes.lines_added > 0 ? '+' : ''}${changes.lines_added} righe, ${changes.chars_changed} caratteri modificati\n`;
+                    });
+                }
+                
+                if (diff.deleted.length > 0) {
+                    diffText += `❌ Files eliminati (${diff.deleted.length}): ${diff.deleted.join(', ')}\n`;
+                }
+                
+                if (diff.added.length === 0 && diff.modified.length === 0 && diff.deleted.length === 0) {
+                    diffText += 'Nessuna differenza trovata';
+                }
+                
+                diffDiv.textContent = diffText;
+            } catch (e) {
+                document.getElementById('version-diff').textContent = 'Errore confronto versioni';
+            }
+        }
+        
+        // Load projects on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProjects();
+        });
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# Environment files
+.env
+*.env
+
+# Logs
+logs/
+*.log
+
+# Backup files
+backup/
+*.tar.gz
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Node modules (se usi Node.js)
+node_modules/
+
+# Workspace temporaneo
+workspace/
+temp/
+
+# Credenziali
+*_cred.json
+*.key
+*.pem
+
+# Database locali
+*.db
+*.sqlite
