@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Assistant DFFM</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            /* Claude.ai inspired colors */
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --bg-surface: #181818;
+            --text-primary: #ffffff;
+            --text-secondary: #a8a8a8;
+            --text-muted: #6b6b6b;
+            --border-primary: #2e2e2e;
+            --border-secondary: #404040;
+            --accent-primary: #ff9500;
+            --accent-secondary: #cc6600;
+            --accent-muted: rgba(255, 149, 0, 0.1);
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+        
+        * { 
+            box-sizing: border-box; 
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+        
+        .nav-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .lang-btn:hover,
+        .lang-btn.active {
+            background: var(--accent-muted);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .status-bar {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+        }
+        
+        .section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-primary);
+        }
+        
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        .input-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-secondary);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-muted);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'SF Mono', Consolas, monospace;
+            line-height: 1.4;
+        }
+        
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .button-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+        
+        .button-primary:hover:not(:disabled) {
+            background: var(--accent-secondary);
+            transform: translateY(-1px);
+        }
+        
+        .button-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-secondary);
+        }
+        
+        .button-secondary:hover:not(:disabled) {
+            background: var(--bg-surface);
+        }
+        
+        .button-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .output-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-secondary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .output-panel.loading {
+            color: var(--warning);
+        }
+        
+        .output-panel.error {
+            color: var(--error);
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .quick-action {
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-secondary);
+            border-radius: 0.375rem;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-action:hover {
+            background: var(--bg-tertiary);
+            color: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+        
+        .upload-zone {
+            border: 2px dashed var(--border-secondary);
+            border-radius: 0.75rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg-surface);
+        }
+        
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--accent-primary);
+            background: var(--accent-muted);
+        }
+        
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-secondary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        
+        .card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+        
+        .file-item {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-secondary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 0.75rem 0;
+            border-left: 3px solid var(--accent-primary);
+        }
+        
+        .file-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .file-size {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .project-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-secondary);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+        }
+        
+        .project-item {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background: var(--bg-tertiary);
+            border-radius: 0.375rem;
+            border-left: 3px solid var(--accent-primary);
+        }
+        
+        .project-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .project-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        .version-timeline {
+            border-left: 2px solid var(--border-secondary);
+            padding-left: 1rem;
+            margin-left: 0.5rem;
+        }
+        
+        .version-item {
+            position: relative;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-primary);
+        }
+        
+        .version-item:before {
+            content: '';
+            position: absolute;
+            left: -1.375rem;
+            top: 1rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            background: var(--accent-primary);
+            border-radius: 50%;
+        }
+        
+        .version-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        .diff-summary {
+            display: flex;
+            gap: 1rem;
+            margin: 0.75rem 0;
+            font-size: 0.75rem;
+        }
+        
+        .diff-added { color: var(--success); }
+        .diff-modified { color: var(--warning); }
+        .diff-removed { color: var(--error); }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-surface);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-secondary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        
+        /* Loading animation */
+        .loading-dots:after {
+            content: '';
+            animation: dots 2s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <a href="#" class="logo">AI Assistant DFFM</a>
+                <div class="nav-controls">
+                    <button class="lang-btn active" onclick="setLanguage('it')" data-lang="it">Italiano</button>
+                    <button class="lang-btn" onclick="setLanguage('en')" data-lang="en">English</button>
+                </div>
+            </div>
+        </header>
+        
+        <main class="main-content">
+            <div class="status-bar" id="status">
+                <strong>Sistema:</strong> <span id="status-text" class="loading-dots">Connessione in corso</span>
+            </div>
+            
+            <!-- Sezione Generazione Codice PLC -->
+            <section class="section">
+                <h2 class="section-title">Generazione Codice PLC</h2>
+                
+                <div class="input-group">
+                    <label class="input-label">Modello AI</label>
+                    <select id="model-select" class="form-select">
+                        <option value="deepseek-coder:6.7b">DeepSeek Coder 6.7B (Consigliato)</option>
+                        <option value="magicoder:7b-s-cl">Magicoder 7B (Veloce)</option>
+                        <option value="mistral:7b-instruct">Mistral 7B (Generale)</option>
+                    </select>
+                </div>
+                
+                <div class="quick-actions">
+                    <span class="quick-action" onclick="setPrompt('plc', 'nj5_opcua')">OPC UA NJ5-1500</span>
+                    <span class="quick-action" onclick="setPrompt('plc', 'conveyor_fb')">Function Block Trasportatore</span>
+                    <span class="quick-action" onclick="setPrompt('plc', 'safety_timer')">Timer Sicurezza</span>
+                    <span class="quick-action" onclick="setPrompt('plc', 'motor_control')">Controllo Motore</span>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Richiesta</label>
+                    <textarea id="plc-prompt" class="form-textarea" rows="4" placeholder="Descrivi il codice PLC che vuoi generare..."></textarea>
+                </div>
+                
+                <div>
+                    <button class="button button-primary" onclick="generatePLC()" id="generate-btn">Genera Codice</button>
+                    <button class="button button-success" onclick="saveToVersion('plc-output')">Salva Versione</button>
+                </div>
+                
+                <div class="output-panel" id="plc-output"></div>
+            </section>
+            
+            <!-- Sezione Upload File -->
+            <section class="section">
+                <h2 class="section-title">Analisi File</h2>
+                
+                <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+                    <div class="upload-icon">📁</div>
+                    <p>Clicca per selezionare o trascina file qui</p>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        Supportati: TXT, MD, PDF, DOCX, JSON, XML, CSV, ST
+                    </p>
+                    <input type="file" id="file-input" accept=".txt,.md,.pdf,.docx,.json,.xml,.csv,.st" style="display: none;" onchange="uploadFile()">
+                </div>
+                
+                <div class="output-panel" id="upload-status" style="display: none;"></div>
+                <div id="uploaded-files"></div>
+            </section>
+            
+            <!-- Sezione Analisi Documentazione -->
+            <section class="section">
+                <h2 class="section-title">Analisi Documentazione</h2>
+                
+                <div class="input-group">
+                    <label class="input-label">Contenuto da analizzare</label>
+                    <textarea id="doc-content" class="form-textarea" rows="6" placeholder="Incolla qui la documentazione da analizzare..."></textarea>
+                </div>
+                
+                <div>
+                    <button class="button button-primary" onclick="analyzeDoc()">Analizza</button>
+                    <button class="button button-success" onclick="saveToVersion('doc-output')">Salva Versione</button>
+                </div>
+                
+                <div class="output-panel" id="doc-output"></div>
+            </section>
+            
+            <!-- Sezione Versioning -->
+            <section class="section">
+                <h2 class="section-title">Gestione Versioni</h2>
+                
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 class="card-title">Progetti</h3>
+                        <div class="project-list" id="projects-list"></div>
+                        <button class="button button-secondary" onclick="loadProjects()">Aggiorna</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 class="card-title">Nuovo Progetto</h3>
+                        <div class="input-group">
+                            <input type="text" id="new-project-name" class="form-input" placeholder="Nome progetto">
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="new-project-desc" class="form-input" placeholder="Descrizione">
+                        </div>
+                        <button class="button button-primary" onclick="createProject()">Crea</button>
+                    </div>
+                </div>
+                
+                <div style="border-top: 1px solid var(--border-primary); padding-top: 1.5rem; margin-top: 1.5rem;">
+                    <h3 class="card-title">Salva Documento</h3>
+                    <div class="input-group">
+                        <label class="input-label">Progetto</label>
+                        <select id="project-select" class="form-select">
+                            <option value="">Seleziona progetto...</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Contenuto</label>
+                        <textarea id="document-content" class="form-textarea" rows="6" placeholder="Contenuto da salvare..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="commit-message" class="form-input" placeholder="Messaggio di commit">
+                    </div>
+                    <button class="button button-primary" onclick="saveDocument()">Salva Versione</button>
+                </div>
+                
+                <div style="border-top: 1px solid var(--border-primary); padding-top: 1.5rem; margin-top: 1.5rem;">
+                    <h3 class="card-title">Cronologia</h3>
+                    <div class="input-group">
+                        <select id="history-project-select" class="form-select" onchange="loadVersionHistory()">
+                            <option value="">Seleziona progetto...</option>
+                        </select>
+                    </div>
+                    <div class="output-panel" id="version-history" style="max-height: 300px;"></div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <h4 style="margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 0.875rem;">Confronta Versioni</h4>
+                        <div class="grid-2" style="margin: 0.75rem 0;">
+                            <select id="compare-version-a" class="form-select">
+                                <option value="">Versione A...</option>
+                            </select>
+                            <select id="compare-version-b" class="form-select">
+                                <option value="">Versione B...</option>
+                            </select>
+                        </div>
+                        <button class="button button-secondary" onclick="compareVersions()">Confronta</button>
+                        <div class="output-panel" id="version-diff"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Sezione Modelli AI -->
+            <section class="section">
+                <h2 class="section-title">Modelli AI</h2>
+                <button class="button button-secondary" onclick="loadModels()">Aggiorna Lista</button>
+                <div class="output-panel" id="models-output"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let currentLanguage = 'it';
+        let currentProjects = [];
+        
+        const prompts = {
+            it: {
+                nj5_opcua: "Come configurare OPC UA Server su PLC Omron NJ5-1500 con SysmacStudio? Includi: configurazione hardware, setup comunicazione EtherNet/IP, abilitazione OPC UA Server, configurazione certificati, pubblicazione variabili e test connessione.",
+                conveyor_fb: "Crea Function Block in Structured Text per controllo nastro trasportatore con sensori presenza, pulsanti start/stop e gestione emergenza.",
+                safety_timer: "Implementa timer di sicurezza con logica fail-safe per arresto di emergenza in Structured Text.",
+                motor_control: "Crea controllo motore trifase con soft-start, monitoraggio corrente e protezioni termiche."
+            },
+            en: {
+                nj5_opcua: "How to configure OPC UA Server on Omron NJ5-1500 PLC with SysmacStudio? Include: hardware configuration, EtherNet/IP communication setup, OPC UA Server enabling, certificate configuration, variable publishing and connection testing.",
+                conveyor_fb: "Create Function Block in Structured Text for conveyor belt control with presence sensors, start/stop buttons and emergency management.",
+                safety_timer: "Implement safety timer with fail-safe logic for emergency stop in Structured Text.",
+                motor_control: "Create three-phase motor control with soft-start, current monitoring and thermal protection."
+            }
+        };
+        
+        // Inizializzazione
+        window.addEventListener('DOMContentLoaded', function() {
+            checkStatus();
+            loadModels();
+            loadProjects();
+            updateLanguage();
+            setupDragAndDrop();
+        });
+        
+        // Gestione Lingua
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+            updateLanguage();
+        }
+        
+        function updateLanguage() {
+            const btn = document.getElementById('generate-btn');
+            btn.textContent = currentLanguage === 'it' ? 'Genera Codice' : 'Generate Code';
+        }
+        
+        function setPrompt(type, promptKey) {
+            const prompt = prompts[currentLanguage][promptKey];
+            document.getElementById('plc-prompt').value = prompt;
+        }
+        
+        // Status e Modelli
+        async function checkStatus() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                document.getElementById('status-text').textContent = `Sistema operativo - ${data.cpu_threads} core disponibili`;
+            } catch (e) {
+                document.getElementById('status-text').textContent = 'Errore di connessione';
+            }
+        }
+        
+        async function loadModels() {
+            const output = document.getElementById('models-output');
+            output.textContent = 'Caricamento modelli...';
+            output.className = 'output-panel loading';
+            
+            try {
+                const response = await fetch('/api/models');
+                const data = await response.json();
+                
+                if (data.models) {
+                    let outputText = `Modelli disponibili (${data.models.length}):\n\n`;
+                    data.models.forEach(model => {
+                        const sizeGB = (model.size / (1024*1024*1024)).toFixed(1);
+                        const modified = new Date(model.modified_at).toLocaleDateString('it-IT');
+                        outputText += `${model.name}\n`;
+                        outputText += `  Dimensione: ${sizeGB} GB\n`;
+                        outputText += `  Modificato: ${modified}\n\n`;
+                    });
+                    output.textContent = outputText;
+                } else {
+                    output.textContent = data.error || 'Errore caricamento modelli';
+                }
+                output.className = 'output-panel';
+            } catch (e) {
+                output.textContent = 'Errore connessione: ' + e.message;
+                output.className = 'output-panel error';
+            }
+        }
+        
+        // Generazione AI
+        async function generatePLC() {
+            const prompt = document.getElementById('plc-prompt').value;
+            const model = document.getElementById('model-select').value;
+            
+            if (!prompt.trim()) {
+                alert('Inserisci una richiesta');
+                return;
+            }
+            
+            const btn = document.getElementById('generate-btn');
+            const output = document.getElementById('plc-output');
+            
+            btn.disabled = true;
+            btn.textContent = 'Generazione in corso...';
+            output.textContent = 'Elaborazione richiesta...';
+            output.className = 'output-panel loading';
+            
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({prompt, model})
+                });
+                
+                const data = await response.json();
+                output.textContent = data.response || data.error;
+                output.className = data.response ? 'output-panel' : 'output-panel error';
+            } catch (e) {
+                output.textContent = 'Errore di rete: ' + e.message;
+                output.className = 'output-panel error';
+            } finally {
+                btn.disabled = false;
+                updateLanguage();
+            }
+        }
+        
+        async function analyzeDoc() {
+            const content = document.getElementById('doc-content').value;
+            
+            if (!content.trim()) {
+                alert('Inserisci contenuto da analizzare');
+                return;
+            }
+            
+            const output = document.getElementById('doc-output');
+            output.textContent = 'Analisi in corso...';
+            output.className = 'output-panel loading';
+            
+            const analyzePrompt = `Analizza questa documentazione tecnica e suggerisci miglioramenti:\n\n${content}\n\nFornisci:\n1. Valutazione chiarezza\n2. Sezioni mancanti\n3. Miglioramenti strutturali\n4. Suggerimenti tecnici`;
+            
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({prompt: analyzePrompt, model: 'deepseek-coder:6.7b'})
+                });
+                
+                const data = await response.json();
+                output.textContent = data.response || data.error;
+                output.className = data.response ? 'output-panel' : 'output-panel error';
+            } catch (e) {
+                output.textContent = 'Errore analisi: ' + e.message;
+                output.className = 'output-panel error';
+            }
+        }
+        
+        // Upload File
+        function setupDragAndDrop() {
+            const zone = document.getElementById('upload-zone');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                zone.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, unhighlight, false);
+            });
+            
+            zone.addEventListener('drop', handleDrop, false);
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
