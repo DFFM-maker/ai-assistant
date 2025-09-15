@@ -7,6 +7,11 @@ const app = express();
 
 app.use(session({ secret: "your_secret", resave: false, saveUninitialized: true }));
 
+// Endpoint di test per lo status del backend
+app.get('/api/status', (req, res) => {
+  res.json({ status: "ok" });
+});
+
 app.get('/auth/gitlab', (req, res) => {
   const redirect = `https://gitlab.dffm.it/oauth/authorize?client_id=${process.env.GITLAB_CLIENT_ID}&redirect_uri=${process.env.GITLAB_CALLBACK_URL}&response_type=code&scope=read_user+openid+profile+email+api`;
   res.redirect(redirect);
