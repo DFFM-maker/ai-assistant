@@ -18,6 +18,9 @@ __pycache__/
 # Node modules (se usi Node.js)
 node_modules/
 
+# React builds
+web/frontend/build/
+
 # Workspace temporaneo
 workspace/
 temp/
