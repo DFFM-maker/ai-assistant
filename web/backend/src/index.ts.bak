@@ -9,16 +9,12 @@ app.use(cors({
 }));
 
 // ...altre API...
-// Route di test per /
-app.get('/', (req, res) => {
-  res.send('Backend Express funzionante!');
-});
+
 // Auth routes
 app.use('/api', gitlabAuth);
 
 // ...altre API...
 
-// MODIFICA QUI: ascolta su tutte le interfacce!
-app.listen(4000, '0.0.0.0', () => {
+app.listen(4000, () => {
   console.log('Backend listening on port 4000');
 });

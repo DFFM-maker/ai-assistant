@@ -1,61 +1,72 @@
-import express from 'express';
+import dotenv from 'dotenv';
+dotenv.config();
+
+import express, { Request, Response } from 'express';
 import passport from 'passport';
 import session from 'express-session';
 import { Strategy as GitLabStrategy } from 'passport-gitlab2';
 
-const CLIENT_ID = 'a3745bcb6294200e3d68cee33c263a26fddea15fd817b36d93595fb7b8c3796c';
-const CLIENT_SECRET = 'gloas-e0e92261d75c2e31e3f42b6471433db57804bf18758792c4fd29e0ab75f3bd4d';
-const GITLAB_BASE_URL = 'https://gitlab.dffm.it'; // Cambia se il tuo dominio GitLab è diverso.
-const CALLBACK_URL = process.env.NODE_ENV === 'production'
-  ? 'https://ai-assistant.dffm.it/api/auth/gitlab/callback'
-  : 'http://localhost:4000/api/auth/gitlab/callback';
+// Usa variabili d'ambiente dal file .env
+const CLIENT_ID = process.env.GITLAB_CLIENT_ID!;
+const CLIENT_SECRET = process.env.GITLAB_CLIENT_SECRET!;
+const GITLAB_BASE_URL = process.env.GITLAB_BASE_URL!;
+const CALLBACK_URL = process.env.GITLAB_CALLBACK_URL!;
+const SCOPES = process.env.GITLAB_SCOPES?.split(',') ?? ['read_user'];
 
-passport.serializeUser((user, done) => {
+passport.serializeUser((user: any, done: (err: any, id?: any) => void) => {
   done(null, user);
 });
-passport.deserializeUser((obj: any, done) => {
+passport.deserializeUser((obj: any, done: (err: any, user?: any) => void) => {
   done(null, obj);
 });
 
-passport.use(new GitLabStrategy(
-  {
-    clientID: CLIENT_ID,
-    clientSecret: CLIENT_SECRET,
-    callbackURL: CALLBACK_URL,
-    baseURL: GITLAB_BASE_URL,
-    scope: ['read_user'],
-  },
-  (accessToken, refreshToken, profile, done) => {
-    // Qui puoi salvare altre info dell'utente se vuoi
-    return done(null, {
-      id: profile.id,
-      username: profile.username,
-      name: profile.displayName,
-      avatar: profile.avatarUrl,
-      accessToken
-    });
-  }
-));
+passport.use(
+  new GitLabStrategy(
+    {
+      clientID: CLIENT_ID,
+      clientSecret: CLIENT_SECRET,
+      callbackURL: CALLBACK_URL,
+      baseURL: GITLAB_BASE_URL,
+      scope: SCOPES,
+    },
+    (
+      accessToken: string,
+      refreshToken: string,
+      profile: any,
+      done: (error: any, user?: any) => void
+    ) => {
+      return done(null, {
+        id: profile.id,
+        username: profile.username,
+        name: profile.displayName,
+        avatar: profile.avatarUrl,
+        accessToken,
+      });
+    }
+  )
+);
 
 const router = express.Router();
 
 // Sessione
-router.use(session({
-  secret: 'cambia-questa-stringa-con-una-complessa',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // true solo in https
-    sameSite: 'lax',
-  },
-}));
+router.use(
+  session({
+    secret: process.env.SECRET_KEY || 'cambia-questa-stringa-con-una-complessa',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // true solo in https
+      sameSite: 'lax',
+    },
+  })
+);
 
 router.use(passport.initialize());
 router.use(passport.session());
 
 // Avvia login
-router.get('/auth/gitlab', passport.authenticate('gitlab', { scope: ['read_user'] }));
+router.get('/auth/gitlab', passport.authenticate('gitlab', { scope: SCOPES }));
 
 // Callback dopo login
 router.get(
@@ -64,21 +75,22 @@ router.get(
     failureRedirect: '/', // O una pagina di errore custom
     session: true,
   }),
-  (req, res) => {
-    // Dopo login reindirizza al frontend
+  (req: Request, res: Response) => {
     res.redirect('/'); // o dove vuoi tu
   }
 );
 
 // Logout
-router.get('/auth/logout', (req, res) => {
+router.get('/auth/logout', (req: Request, res: Response) => {
+  // @ts-ignore: proprietà aggiunta da passport
   req.logout(() => {
     res.redirect('/');
   });
 });
 
 // API per sapere chi è loggato
-router.get('/user', (req, res) => {
+router.get('/user', (req: Request, res: Response) => {
+  // @ts-ignore: proprietà aggiunta da passport
   if (req.isAuthenticated() && req.user) {
     res.json(req.user);
   } else {
