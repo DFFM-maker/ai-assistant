@@ -12,7 +12,8 @@
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "passport": "^0.7.0",
-    "passport-gitlab2": "^5.0.0"
+    "passport-gitlab2": "^5.0.0",
+    "simple-git": "^3.28.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

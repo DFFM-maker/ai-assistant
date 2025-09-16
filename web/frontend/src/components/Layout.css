@@ -1,13 +1,33 @@
 .app-layout {
   display: flex;
   min-height: 100vh;
+  background-color: var(--color-bg-primary);
+  transition: background-color var(--transition-normal);
 }
 
 .main-content {
   flex: 1;
   margin-left: 220px; /* Sidebar width */
+  margin-right: 300px; /* VersionPanel width */
   margin-top: 60px; /* Header height */
-  padding: 32px;
-  background: #181c1f;
-  color: #e3e6ea;
+  padding: var(--spacing-xl);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  min-height: calc(100vh - 60px);
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .main-content {
+    margin-right: 250px; /* Smaller VersionPanel */
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 60px; /* Collapsed sidebar */
+    margin-right: 0; /* Hide VersionPanel on mobile */
+    padding: var(--spacing-md);
+  }
 }

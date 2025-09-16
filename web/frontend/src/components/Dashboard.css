@@ -1,0 +1,228 @@
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: var(--spacing-2xl);
+  text-align: center;
+}
+
+.dashboard-header h1 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-tertiary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dashboard-header p {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+}
+
+/* Status Grid */
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.status-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-normal);
+}
+
+.status-card:hover {
+  border-color: var(--color-border-focus);
+  box-shadow: var(--shadow-md);
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.status-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.status-indicator {
+  font-size: 16px;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+}
+
+.status-indicator.checking {
+  color: var(--color-warning);
+}
+
+.status-indicator.connected {
+  color: var(--color-success);
+}
+
+.status-indicator.disconnected {
+  color: var(--color-error);
+}
+
+.status-content p {
+  margin: var(--spacing-xs) 0;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+/* Quick Actions */
+.quick-actions {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.quick-actions h2 {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.action-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  display: block;
+}
+
+.action-card:hover:not(.disabled) {
+  border-color: var(--color-brand-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.action-card.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.action-icon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-md);
+  display: block;
+}
+
+.action-card h3 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.action-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* Recent Activity */
+.recent-activity h2 {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.activity-list {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-primary);
+  transition: background-color var(--transition-fast);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-item:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.activity-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-content p {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: 0.9rem;
+}
+
+.activity-content p:first-child {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.activity-content p:last-of-type {
+  color: var(--color-text-secondary);
+}
+
+.activity-time {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-header h1 {
+    font-size: 2rem;
+  }
+  
+  .status-grid,
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-card,
+  .status-card {
+    padding: var(--spacing-md);
+  }
+  
+  .activity-item {
+    padding: var(--spacing-md);
+  }
+}

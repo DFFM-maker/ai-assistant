@@ -1,56 +1,34 @@
+/* Legacy styles - will be gradually migrated to new theme system */
+
+/* Remove conflicting styles and use theme variables */
 body {
-  background: #181c1f;
-  color: #e3e6ea;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-sans);
   margin: 0;
   padding: 0;
-}
-.app-layout {
-  display: flex;
-  min-height: 100vh;
-}
-.main-content {
-  flex: 1;
-  margin-left: 220px;
-  margin-right: 300px;
-  margin-top: 70px; /* Account for fixed user panel */
-  padding: 32px;
-}
-.sidebar {
-  background: #22272e;
-  color: #c9d1d9;
-  width: 220px;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  padding-top: 24px;
-}
-.version-panel {
-  background: #23272e;
-  border-left: 1px solid #30363d;
-  position: fixed;
-  right: 0;
-  top: 0;
-  width: 300px;
-  height: 100vh;
-  padding: 16px;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
-/* User Panel Styles */
+/* Legacy layout adjustments */
+.main-content {
+  background-color: var(--color-bg-primary);
+}
+
+/* User Panel Legacy Styles - Updated for theme compatibility */
 .user-panel {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 16px;
-  border-bottom: 1px solid #30363d;
-  background: #22272e;
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-primary);
+  background-color: var(--color-header-bg);
 }
 
 .user-panel-loading {
-  color: #7d8590;
+  color: var(--color-text-secondary);
   font-size: 14px;
   text-align: center;
 }
@@ -59,13 +37,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--spacing-sm);
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacing-sm);
   flex: 1;
 }
 
@@ -73,7 +51,7 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 2px solid #30363d;
+  border: 2px solid var(--color-border-primary);
 }
 
 .user-details {
@@ -85,12 +63,12 @@ body {
 .user-name {
   font-weight: 600;
   font-size: 14px;
-  color: #e3e6ea;
+  color: var(--color-text-primary);
 }
 
 .user-username {
   font-size: 12px;
-  color: #7d8590;
+  color: var(--color-text-secondary);
 }
 
 .logout-link, .login-link {
@@ -98,23 +76,23 @@ body {
 }
 
 .logout-button, .login-button {
-  background: #238636;
-  color: #fff;
+  background-color: var(--color-success);
+  color: white;
   border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-fast);
 }
 
 .logout-button:hover, .login-button:hover {
-  background: #2ea043;
+  background-color: #2ea043;
 }
 
 .logout-button {
-  background: #da3633;
+  background-color: var(--color-error);
 }
 
 .logout-button:hover {
