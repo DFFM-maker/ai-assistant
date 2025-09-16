@@ -20,9 +20,9 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, loading }) => {
       {user ? (
         <div className="user-panel-authenticated">
           <div className="user-info">
-            <img 
-              src={user.avatar} 
-              alt={`${user.username} avatar`} 
+            <img
+              src={user.avatar}
+              alt={`${user.username} avatar`}
               className="user-avatar"
             />
             <div className="user-details">
@@ -30,7 +30,7 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, loading }) => {
               <span className="user-username">@{user.username}</span>
             </div>
           </div>
-          <a href="/api/auth/logout" className="logout-link">
+          <a href="http://192.168.1.250:4000/api/auth/logout" className="logout-link">
             <button className="logout-button" type="button">
               Logout
             </button>
@@ -38,11 +38,13 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, loading }) => {
         </div>
       ) : (
         <div className="user-panel-unauthenticated">
-          <a href="/api/auth/gitlab" className="login-link">
-            <button className="login-button" type="button">
-              Login con GitLab
-            </button>
-          </a>
+          <button
+            className="login-button"
+            type="button"
+            onClick={() => window.location.href = 'http://192.168.1.250:4000/api/auth/gitlab'}
+          >
+            Login con GitLab
+          </button>
         </div>
       )}
     </div>

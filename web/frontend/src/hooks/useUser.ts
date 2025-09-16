@@ -8,13 +8,13 @@ export const useUser = (): UserContextType => {
   const fetchUser = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/user', { 
+      const response = await fetch('http://192.168.1.250:4000/api/user', {
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
         }
       });
-      
+
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);

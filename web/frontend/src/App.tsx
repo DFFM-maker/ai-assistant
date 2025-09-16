@@ -6,6 +6,23 @@ import './styles.css';
 function App() {
   const { user, loading } = useUser();
 
+  // Funzione di logout
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'GET',
+        credentials: 'include', // Necessario se usi cookie di sessione
+      });
+      if (response.ok) {
+        window.location.href = 'http://localhost:4000/login'; // Cambia se la tua login è altrove
+      } else {
+        alert('Errore durante il logout dal server.');
+      }
+    } catch (error) {
+      alert('Errore di rete: ' + error);
+    }
+  };
+
   return (
     <div className="app">
       <UserPanel user={user} loading={loading} />
@@ -15,6 +32,9 @@ function App() {
           <div>
             <p>Welcome back, {user.name}!</p>
             {/* Main application content goes here */}
+            <button onClick={handleLogout} className="logout-btn">
+              Logout
+            </button>
           </div>
         ) : (
           <div>
