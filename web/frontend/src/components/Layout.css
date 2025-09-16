@@ -1,0 +1,13 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 220px; /* Sidebar width */
+  margin-top: 60px; /* Header height */
+  padding: 32px;
+  background: #181c1f;
+  color: #e3e6ea;
+}

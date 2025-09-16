@@ -1,0 +1,33 @@
+.sidebar {
+  background: #22272e;
+  color: #c9d1d9;
+  width: 220px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 60px; /* Account for header */
+  padding-top: 24px;
+  border-right: 1px solid #30363d;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar nav ul li {
+  margin-bottom: 8px;
+}
+
+.sidebar nav ul li a {
+  display: block;
+  padding: 12px 20px;
+  color: #c9d1d9;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.sidebar nav ul li a:hover {
+  background: #30363d;
+}

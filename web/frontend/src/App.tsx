@@ -1,48 +1,56 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useUser } from './hooks/useUser';
-import UserPanel from './components/UserPanel';
+import Layout from './components/Layout';
+import Dashboard from './components/Dashboard';
+import Login from './components/Login';
+import ProtectedRoute from './components/ProtectedRoute';
+import Spinner from './components/Spinner';
 import './styles.css';
 
 function App() {
   const { user, loading } = useUser();
 
-  // Funzione di logout
+  // Logout function using React Router
   const handleLogout = async () => {
     try {
       const response = await fetch('/api/auth/logout', {
         method: 'GET',
-        credentials: 'include', // Necessario se usi cookie di sessione
+        credentials: 'include',
       });
-      if (response.ok) {
-        window.location.href = 'http://localhost:4000/login'; // Cambia se la tua login è altrove
-      } else {
-        alert('Errore durante il logout dal server.');
+      if (!response.ok) {
+        console.error('Logout failed');
       }
+      // Navigation will be handled by the Header component
     } catch (error) {
-      alert('Errore di rete: ' + error);
+      console.error('Logout error:', error);
     }
   };
 
+  // Show spinner during initial load
+  if (loading) {
+    return <Spinner />;
+  }
+
   return (
-    <div className="app">
-      <UserPanel user={user} loading={loading} />
-      <div className="main-content">
-        <h1>AI Assistant</h1>
-        {user ? (
-          <div>
-            <p>Welcome back, {user.name}!</p>
-            {/* Main application content goes here */}
-            <button onClick={handleLogout} className="logout-btn">
-              Logout
-            </button>
-          </div>
-        ) : (
-          <div>
-            <p>Please log in to access the AI Assistant.</p>
-          </div>
-        )}
-      </div>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute user={user} loading={loading}>
+              <Layout user={user} onLogout={handleLogout} />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={user ? <Dashboard user={user} /> : <Navigate to="/login" replace />} />
+          <Route path="dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/login" replace />} />
+          {/* Add more protected routes here as needed */}
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
   );
 }
 
