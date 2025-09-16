@@ -4,9 +4,10 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  background: #22272e;
-  border-bottom: 1px solid #30363d;
+  background-color: var(--color-header-bg);
+  border-bottom: 1px solid var(--color-header-border);
   height: 60px;
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
 }
 
 .header-content {
@@ -14,41 +15,80 @@
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  padding: 0 20px;
+  padding: 0 var(--spacing-lg);
   max-width: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  font-size: 16px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.theme-toggle:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border-focus);
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacing-sm);
 }
 
 .user-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 2px solid #30363d;
+  border: 2px solid var(--color-border-primary);
+  transition: border-color var(--transition-normal);
 }
 
 .user-name {
   font-weight: 600;
   font-size: 14px;
-  color: #e3e6ea;
+  color: var(--color-text-primary);
 }
 
 .logout-button {
-  background: #da3633;
-  color: #fff;
+  background-color: var(--color-error);
+  color: white;
   border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs) var(--spacing-md);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-fast);
 }
 
 .logout-button:hover {
-  background: #f85149;
+  background-color: #f85149;
 }

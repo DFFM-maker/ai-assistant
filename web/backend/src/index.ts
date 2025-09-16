@@ -3,8 +3,11 @@ import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
 import gitlabAuth, { userCache } from './gitlabAuth';
+import gitRoutes from './routes/git';
 
 const app = express();
+
+app.use(express.json()); // Add JSON body parser for POST requests
 
 app.use(cors({
   origin: 'http://192.168.1.250:3000',
@@ -50,6 +53,7 @@ app.get('/api/auth/logout', (req, res, next) => {
 });
 
 app.use('/api', gitlabAuth);
+app.use('/api/git', gitRoutes);
 
 app.listen(4000, '0.0.0.0', () => {
   console.log('Backend listening on port 4000');
