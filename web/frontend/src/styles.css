@@ -13,6 +13,7 @@ body {
   flex: 1;
   margin-left: 220px;
   margin-right: 300px;
+  margin-top: 70px; /* Account for fixed user panel */
   padding: 32px;
 }
 .sidebar {
@@ -34,4 +35,92 @@ body {
   width: 300px;
   height: 100vh;
   padding: 16px;
+}
+
+/* User Panel Styles */
+.user-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 16px;
+  border-bottom: 1px solid #30363d;
+  background: #22272e;
+}
+
+.user-panel-loading {
+  color: #7d8590;
+  font-size: 14px;
+  text-align: center;
+}
+
+.user-panel-authenticated {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #30363d;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #e3e6ea;
+}
+
+.user-username {
+  font-size: 12px;
+  color: #7d8590;
+}
+
+.logout-link, .login-link {
+  text-decoration: none;
+}
+
+.logout-button, .login-button {
+  background: #238636;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover, .login-button:hover {
+  background: #2ea043;
+}
+
+.logout-button {
+  background: #da3633;
+}
+
+.logout-button:hover {
+  background: #f85149;
+}
+
+.user-panel-unauthenticated {
+  text-align: center;
 }

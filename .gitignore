@@ -18,6 +18,10 @@ __pycache__/
 # Node modules (se usi Node.js)
 node_modules/
 
+# Build artifacts
+web/frontend/build/
+web/backend/dist/
+
 # Workspace temporaneo
 workspace/
 temp/
