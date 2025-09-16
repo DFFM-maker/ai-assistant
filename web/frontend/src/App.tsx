@@ -1,31 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import LoginGitlab from './LoginGitlab';
+import React from 'react';
+import { useUser } from './hooks/useUser';
+import UserPanel from './components/UserPanel';
+import './styles.css';
 
 function App() {
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    fetch('/api/user', { credentials: 'include' })
-      .then(res => {
-        if (res.ok) return res.json();
-        throw new Error('Not authenticated');
-      })
-      .then(setUser)
-      .catch(() => setUser(null));
-  }, []);
+  const { user, loading } = useUser();
 
   return (
-    <div>
-      <h1>AI Assistant</h1>
-      {user ? (
-        <div>
-          <img src={user.avatar} alt="avatar" width={32} style={{ borderRadius: '50%' }} />
-          <strong>{user.name} ({user.username})</strong>
-          <a href="/api/auth/logout"><button>Logout</button></a>
-        </div>
-      ) : (
-        <LoginGitlab />
-      )}
+    <div className="app">
+      <UserPanel user={user} loading={loading} />
+      <div className="main-content">
+        <h1>AI Assistant</h1>
+        {user ? (
+          <div>
+            <p>Welcome back, {user.name}!</p>
+            {/* Main application content goes here */}
+          </div>
+        ) : (
+          <div>
+            <p>Please log in to access the AI Assistant.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
