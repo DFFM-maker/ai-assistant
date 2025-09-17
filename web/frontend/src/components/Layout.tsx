@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   return (
     <div className="app-layout">
       <Header user={user} onLogout={onLogout} />
-      <Sidebar />
+      <Sidebar user={user} />
       <main className="main-content">
         <Outlet />
       </main>
