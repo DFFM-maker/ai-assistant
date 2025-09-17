@@ -3,8 +3,10 @@ import { Link, useLocation } from "react-router-dom";
 import { User } from "../types/User";
 import ChatList from "./ChatList";
 import Settings from "./Settings";
+import SettingsPanel from "./SettingsPanel";
 import NewChatModal from "./NewChatModal";
 import { useChat } from "../hooks/useChat";
+import { useUserSettings } from "../hooks/useUserSettings";
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -14,7 +16,9 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ user }) => {
   const location = useLocation();
   const { switchSession } = useChat();
+  const { settings } = useUserSettings();
   const [showSettings, setShowSettings] = useState(false);
+  const [showUserSettings, setShowUserSettings] = useState(false);
   const [showNewChatModal, setShowNewChatModal] = useState(false);
 
   const isActive = (path: string) => {
@@ -23,6 +27,22 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
 
   const handleNewChat = () => {
     setShowNewChatModal(true);
+  };
+
+  const handleUserProfileClick = () => {
+    setShowUserSettings(true);
+  };
+
+  const getUserAvatar = () => {
+    return settings.avatar || user?.avatar || '';
+  };
+
+  const getUserName = () => {
+    return settings.name || user?.name || 'User';
+  };
+
+  const getUserEmail = () => {
+    return settings.email || user?.email || user?.username || '';
   };
 
   const handleChatCreated = (sessionId: string) => {
@@ -109,15 +129,19 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
         )}
         
         {user && (
-          <div className="user-profile">
+          <div 
+            className="user-profile clickable" 
+            onClick={handleUserProfileClick}
+            title="Click to open user settings"
+          >
             <img 
-              src={user.avatar} 
-              alt={user.name}
+              src={getUserAvatar() || 'https://via.placeholder.com/40/3b82f6/ffffff?text=U'} 
+              alt={getUserName()}
               className="user-avatar"
             />
             <div className="user-details">
-              <div className="user-name">{user.name}</div>
-              <div className="user-username">@{user.username}</div>
+              <div className="user-name">{getUserName()}</div>
+              <div className="user-username">{getUserEmail() ? getUserEmail() : `@${user.username}`}</div>
             </div>
           </div>
         )}
@@ -131,6 +155,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
       <Settings 
         isOpen={showSettings} 
         onClose={() => setShowSettings(false)} 
+      />
+      
+      <SettingsPanel
+        isOpen={showUserSettings}
+        onClose={() => setShowUserSettings(false)}
+        user={user}
       />
       
       <NewChatModal

@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../types/User';
 import { useTheme } from '../hooks/useTheme';
+import { useUserSettings } from '../hooks/useUserSettings';
 import './Header.css';
 
 interface HeaderProps {
@@ -12,10 +13,19 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const { settings } = useUserSettings();
 
   const handleLogout = async () => {
     await onLogout();
     navigate('/login');
+  };
+
+  const getUserAvatar = () => {
+    return settings.avatar || user?.avatar || '';
+  };
+
+  const getUserName = () => {
+    return settings.name || user?.name || 'User';
   };
 
   if (!user) return null;
@@ -38,11 +48,11 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
           
           <div className="user-info">
             <img
-              src={user.avatar}
-              alt={`${user.username} avatar`}
+              src={getUserAvatar() || 'https://via.placeholder.com/32/3b82f6/ffffff?text=U'}
+              alt={`${getUserName()} avatar`}
               className="user-avatar"
             />
-            <span className="user-name">{user.name}</span>
+            <span className="user-name">{getUserName()}</span>
           </div>
           
           <button onClick={handleLogout} className="logout-button">

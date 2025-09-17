@@ -7,8 +7,7 @@
 
 .main-content {
   flex: 1;
-  margin-left: 280px; /* Updated sidebar width */
-  margin-right: 300px; /* VersionPanel width */
+  margin-left: 280px; /* Sidebar width */
   margin-top: 60px; /* Header height */
   padding: var(--spacing-xl);
   background-color: var(--color-bg-primary);
@@ -20,14 +19,13 @@
 /* Responsive adjustments */
 @media (max-width: 1200px) {
   .main-content {
-    margin-right: 250px; /* Smaller VersionPanel */
+    /* Remove version panel margin adjustments */
   }
 }
 
 @media (max-width: 768px) {
   .main-content {
     margin-left: 60px; /* Collapsed sidebar */
-    margin-right: 0; /* Hide VersionPanel on mobile */
     padding: var(--spacing-md);
   }
 }
