@@ -1,3 +1,10 @@
+import { 
+  ENHANCED_OLLAMA_MODELS, 
+  EnhancedOllamaModel, 
+  getAvailableModelMapping, 
+  getRecommendedModelForQuery 
+} from './ollama_models';
+
 export interface OllamaMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
@@ -35,7 +42,7 @@ export interface IndustrialAIModel {
   language: 'it' | 'en' | 'both';
 }
 
-// Industrial AI models available for automation and PLC development
+// Legacy models for backward compatibility
 export const INDUSTRIAL_MODELS: IndustrialAIModel[] = [
   {
     id: 'sysmacstudio',
@@ -80,6 +87,11 @@ export const INDUSTRIAL_MODELS: IndustrialAIModel[] = [
     language: 'both'
   }
 ];
+
+// Helper function to get legacy model from enhanced model
+export function getIndustrialModel(id: string): IndustrialAIModel | undefined {
+  return INDUSTRIAL_MODELS.find(model => model.id === id);
+}
 
 export class OllamaService {
   private baseUrl: string;
@@ -228,25 +240,78 @@ export class OllamaService {
   }
 
   /**
-   * Get model recommendations based on query type
+   * Get enhanced models with availability status
+   */
+  async getEnhancedModelsWithAvailability(): Promise<(EnhancedOllamaModel & { available: boolean })[]> {
+    try {
+      const installedModels = await this.getAvailableModels();
+      
+      return ENHANCED_OLLAMA_MODELS.map(model => ({
+        ...model,
+        available: model.ollama_model_name ? installedModels.includes(model.ollama_model_name) : false
+      }));
+    } catch (error) {
+      console.error('Error fetching enhanced models:', error);
+      return ENHANCED_OLLAMA_MODELS.map(model => ({ ...model, available: false }));
+    }
+  }
+
+  /**
+   * Get only available enhanced models
+   */
+  async getAvailableEnhancedModels(): Promise<EnhancedOllamaModel[]> {
+    try {
+      const installedModels = await this.getAvailableModels();
+      return getAvailableModelMapping(installedModels);
+    } catch (error) {
+      console.error('Error fetching available enhanced models:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get model recommendations based on query type (enhanced version)
+   */
+  getRecommendedModelEnhanced(query: string): EnhancedOllamaModel {
+    return getRecommendedModelForQuery(query);
+  }
+
+  /**
+   * Get the actual Ollama model name to use for API calls
+   */
+  getOllamaModelName(enhancedModelId: string): string {
+    const enhancedModel = ENHANCED_OLLAMA_MODELS.find(m => m.id === enhancedModelId);
+    if (enhancedModel?.ollama_model_name) {
+      return enhancedModel.ollama_model_name;
+    }
+    
+    // Fallback to legacy mapping or default
+    return this.getRecommendedModel(enhancedModelId);
+  }
+
+  /**
+   * Legacy method for backward compatibility
    */
   getRecommendedModel(query: string): string {
     const queryLower = query.toLowerCase();
     
     if (queryLower.includes('sysmac') || queryLower.includes('omron')) {
-      return 'sysmacstudio';
+      return 'deepseek-coder:6.7b';
     }
     if (queryLower.includes('rockwell') || queryLower.includes('allen-bradley') || queryLower.includes('studio 5000')) {
-      return 'rockwell';
+      return 'magicoder:7b-s-cl';
     }
     if (queryLower.includes('siemens') || queryLower.includes('tia portal') || queryLower.includes('s7')) {
-      return 'siemens';
+      return 'deepseek-coder:6.7b';
     }
     if (queryLower.includes('hmi') || queryLower.includes('scada') || queryLower.includes('interface')) {
-      return 'hmi-designer';
+      return 'llama2:13b-chat';
+    }
+    if (queryLower.includes('code') || queryLower.includes('programming')) {
+      return 'magicoder:7b-s-cl';
     }
     
-    return 'industrial-ai';
+    return 'llama2:13b-chat';
   }
 }
 

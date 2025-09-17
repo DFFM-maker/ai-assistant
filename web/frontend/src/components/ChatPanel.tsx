@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { OllamaMessage, ollamaService, INDUSTRIAL_MODELS, IndustrialAIModel } from '../services/ollamaService';
+import { getRecommendedModelForQuery } from '../services/ollama_models';
 import { useChat } from '../hooks/useChat';
 import { ChatMessage as ChatMessageType } from '../types/Chat';
+import ModelSelector from './ModelSelector';
 import './ChatPanel.css';
 
 interface ChatPanelProps {
@@ -12,7 +14,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
   const { currentSession, addMessage, updateSession } = useChat();
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('industrial-ai');
+  const [selectedModel, setSelectedModel] = useState('llama2-chat'); // Default to enhanced model
   const [selectedLanguage, setSelectedLanguage] = useState<'it' | 'en'>('en');
   const [isConnected, setIsConnected] = useState(false);
   const [availableModels, setAvailableModels] = useState<string[]>([]);
@@ -91,12 +93,22 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
       return;
     }
 
+    // Auto-recommend model based on query if current model is a default one
+    let modelToUse = selectedModel;
+    if (selectedModel === 'llama2-chat' || selectedModel === 'industrial-ai') {
+      const recommendedModel = getRecommendedModelForQuery(inputValue);
+      if (recommendedModel) {
+        modelToUse = recommendedModel.id;
+        setSelectedModel(modelToUse); // Update UI to show recommended model
+      }
+    }
+
     const userMessage: ChatMessageType = {
       id: generateMessageId(),
       role: 'user',
       content: inputValue.trim(),
       timestamp: new Date(),
-      model: selectedModel,
+      model: modelToUse,
       language: selectedLanguage
     };
 
@@ -112,9 +124,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
       
       conversationMessages.push({ role: 'user', content: userMessage.content });
 
+      // Get the actual Ollama model name to use
+      const ollamaModelName = ollamaService.getOllamaModelName(modelToUse);
+
       // Send to Ollama
       const response = await ollamaService.sendMessage(
-        selectedModel,
+        ollamaModelName,
         conversationMessages,
         selectedLanguage
       );
@@ -124,7 +139,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
         role: 'assistant',
         content: response.message.content,
         timestamp: new Date(),
-        model: selectedModel,
+        model: modelToUse,
         language: selectedLanguage
       };
 
@@ -205,51 +220,15 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
             </select>
           </div>
 
-          {/* Model Selector */}
-          <div className="control-group">
+          {/* Enhanced Model Selector */}
+          <div className="control-group model-selector-group">
             <label>AI Model</label>
-            <select 
-              value={selectedModel} 
-              onChange={(e) => setSelectedModel(e.target.value)}
-              className="model-selector"
-              title={getIndustrialModel(selectedModel)?.description}
-            >
-              <optgroup label="Automation">
-                {INDUSTRIAL_MODELS.filter(m => m.category === 'automation').map(model => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))}
-              </optgroup>
-              
-              <optgroup label="PLC">
-                {INDUSTRIAL_MODELS.filter(m => m.category === 'plc').map(model => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))}
-              </optgroup>
-              
-              <optgroup label="HMI">
-                {INDUSTRIAL_MODELS.filter(m => m.category === 'hmi').map(model => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))}
-              </optgroup>
-            </select>
+            <ModelSelector
+              selectedModel={selectedModel}
+              onModelChange={setSelectedModel}
+              className="chat-model-selector"
+            />
           </div>
-
-          {/* Model Info Chip */}
-          {(() => {
-            const model = getIndustrialModel(selectedModel);
-            return model ? (
-              <div className="model-chip" title={model.description}>
-                <span className="chip-category">{model.category.toUpperCase()}</span>
-                <span className="chip-name">{model.name}</span>
-              </div>
-            ) : null;
-          })()}
         </div>
       </div>
 

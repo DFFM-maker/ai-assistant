@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useChat } from '../hooks/useChat';
 import { INDUSTRIAL_MODELS } from '../services/ollamaService';
+import ModelSelector from './ModelSelector';
 import './NewChatModal.css';
 
 interface NewChatModalProps {
@@ -12,7 +13,7 @@ interface NewChatModalProps {
 const NewChatModal: React.FC<NewChatModalProps> = ({ isOpen, onClose, onChatCreated }) => {
   const { groups, createSession } = useChat();
   const [title, setTitle] = useState('');
-  const [selectedModel, setSelectedModel] = useState('industrial-ai');
+  const [selectedModel, setSelectedModel] = useState('llama2-chat');
   const [selectedLanguage, setSelectedLanguage] = useState<'it' | 'en'>('en');
   const [selectedGroupId, setSelectedGroupId] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -47,7 +48,7 @@ const NewChatModal: React.FC<NewChatModalProps> = ({ isOpen, onClose, onChatCrea
 
   const handleClose = () => {
     setTitle('');
-    setSelectedModel('industrial-ai');
+    setSelectedModel('llama2-chat');
     setSelectedLanguage('en');
     setSelectedGroupId(groups.length > 0 ? groups[0].id : '');
     onClose();
@@ -139,57 +140,11 @@ const NewChatModal: React.FC<NewChatModalProps> = ({ isOpen, onClose, onChatCrea
 
           <div className="form-group">
             <label htmlFor="chat-model">AI Model</label>
-            <select
-              id="chat-model"
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-              className="form-control"
-            >
-              <optgroup label="General">
-                {getModelByType('general').map(model => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))}
-              </optgroup>
-              
-              <optgroup label="Automation">
-                {getModelByType('automation').map(model => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))}
-              </optgroup>
-              
-              <optgroup label="PLC Programming">
-                {getModelByType('plc').map(model => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))}
-              </optgroup>
-              
-              <optgroup label="HMI Design">
-                {getModelByType('hmi').map(model => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))}
-              </optgroup>
-            </select>
-
-            {/* Model Description */}
-            {(() => {
-              const model = INDUSTRIAL_MODELS.find(m => m.id === selectedModel);
-              return model ? (
-                <div className="model-description">
-                  <div className="model-info">
-                    <span className="model-category">{model.category.toUpperCase()}</span>
-                    <span className="model-desc">{model.description}</span>
-                  </div>
-                </div>
-              ) : null;
-            })()}
+            <ModelSelector
+              selectedModel={selectedModel}
+              onModelChange={setSelectedModel}
+              className="new-chat-model-selector"
+            />
           </div>
 
           <div className="modal-actions">

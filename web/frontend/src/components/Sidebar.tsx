@@ -146,6 +146,29 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
           </div>
         )}
         
+        {/* Logout Button */}
+        {user && (
+          <div className="logout-section">
+            <button 
+              className="logout-btn"
+              onClick={() => {
+                // Handle logout for demo users
+                if (localStorage.getItem('demo_user')) {
+                  localStorage.removeItem('demo_user');
+                  window.location.reload();
+                } else {
+                  // Handle logout for authenticated users
+                  window.location.href = 'http://192.168.1.250:4000/api/auth/logout';
+                }
+              }}
+              title="Logout"
+            >
+              <span className="nav-icon">🚪</span>
+              <span className="nav-text">Logout</span>
+            </button>
+          </div>
+        )}
+        
         <div className="app-version">
           <span>AI Assistant v1.0.0</span>
         </div>

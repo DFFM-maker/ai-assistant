@@ -235,9 +235,26 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose, user }) 
         </div>
 
         <div className="settings-footer">
-          <button className="btn btn-secondary" onClick={onClose}>
-            Close
-          </button>
+          <div className="footer-actions">
+            <button 
+              className="btn btn-danger logout-btn"
+              onClick={() => {
+                // Handle logout for demo users
+                if (localStorage.getItem('demo_user')) {
+                  localStorage.removeItem('demo_user');
+                  window.location.reload();
+                } else {
+                  // Handle logout for authenticated users
+                  window.location.href = 'http://192.168.1.250:4000/api/auth/logout';
+                }
+              }}
+            >
+              🚪 Logout
+            </button>
+            <button className="btn btn-secondary" onClick={onClose}>
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
