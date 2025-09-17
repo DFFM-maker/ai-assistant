@@ -27,6 +27,12 @@
   margin-bottom: 24px;
 }
 
+.login-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .login-button {
   background: #238636;
   color: #fff;
@@ -42,4 +48,40 @@
 
 .login-button:hover {
   background: #2ea043;
+}
+
+.demo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #30363d;
+}
+
+.demo-text {
+  color: #7d8590;
+  font-size: 13px;
+  margin: 0 0 8px 0;
+}
+
+.demo-button {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.demo-button:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
 }

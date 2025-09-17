@@ -7,7 +7,7 @@
 
 .main-content {
   flex: 1;
-  margin-left: 220px; /* Sidebar width */
+  margin-left: 280px; /* Updated sidebar width */
   margin-right: 300px; /* VersionPanel width */
   margin-top: 60px; /* Header height */
   padding: var(--spacing-xl);

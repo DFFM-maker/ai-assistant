@@ -8,6 +8,16 @@ export const useUser = (): UserContextType => {
   const fetchUser = useCallback(async () => {
     try {
       setLoading(true);
+      
+      // Check for demo user first
+      const demoUserData = localStorage.getItem('demo_user');
+      if (demoUserData) {
+        const demoUser = JSON.parse(demoUserData);
+        setUser(demoUser);
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch('http://192.168.1.250:4000/api/user', {
         credentials: 'include',
         headers: {

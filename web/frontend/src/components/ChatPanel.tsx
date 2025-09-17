@@ -1,20 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { OllamaMessage, ollamaService, INDUSTRIAL_MODELS, IndustrialAIModel } from '../services/ollamaService';
+import { useChat } from '../hooks/useChat';
+import { ChatMessage as ChatMessageType } from '../types/Chat';
 import './ChatPanel.css';
-
-interface ChatMessage extends OllamaMessage {
-  id: string;
-  timestamp: Date;
-  model?: string;
-  language?: 'it' | 'en';
-}
 
 interface ChatPanelProps {
   className?: string;
 }
 
 const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const { currentSession, addMessage, updateSession } = useChat();
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState('industrial-ai');
@@ -24,52 +19,65 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Initialize from current session
+  useEffect(() => {
+    if (currentSession) {
+      setSelectedModel(currentSession.model);
+      setSelectedLanguage(currentSession.language);
+    }
+  }, [currentSession]);
+
   // Check Ollama connection on mount
   useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        const health = await ollamaService.checkHealth();
+        setIsConnected(health);
+        
+        if (health) {
+          const models = await ollamaService.getAvailableModels();
+          setAvailableModels(models);
+        }
+      } catch (error) {
+        console.error('Error checking Ollama connection:', error);
+        setIsConnected(false);
+      }
+    };
+
     checkConnection();
-    loadAvailableModels();
+    
+    // Check connection every 30 seconds
+    const interval = setInterval(checkConnection, 30000);
+    return () => clearInterval(interval);
   }, []);
 
-  // Scroll to bottom when new messages are added
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const checkConnection = async () => {
-    try {
-      const healthy = await ollamaService.checkHealth();
-      setIsConnected(healthy);
-    } catch (error) {
-      console.error('Error checking Ollama connection:', error);
-      setIsConnected(false);
-    }
-  };
-
-  const loadAvailableModels = async () => {
-    try {
-      const models = await ollamaService.getAvailableModels();
-      setAvailableModels(models);
-    } catch (error) {
-      console.error('Error loading available models:', error);
-    }
-  };
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, [currentSession?.messages]);
 
-  const generateMessageId = () => {
+  // Update session when model or language changes
+  useEffect(() => {
+    if (currentSession && (currentSession.model !== selectedModel || currentSession.language !== selectedLanguage)) {
+      updateSession(currentSession.id, {
+        model: selectedModel,
+        language: selectedLanguage,
+      });
+    }
+  }, [selectedModel, selectedLanguage, currentSession, updateSession]);
+
+  const generateMessageId = (): string => {
     return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!inputValue.trim() || isLoading || !isConnected) {
+    if (!inputValue.trim() || isLoading || !isConnected || !currentSession) {
       return;
     }
 
-    const userMessage: ChatMessage = {
+    const userMessage: ChatMessageType = {
       id: generateMessageId(),
       role: 'user',
       content: inputValue.trim(),
@@ -78,13 +86,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
       language: selectedLanguage
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    addMessage(currentSession.id, userMessage);
     setInputValue('');
     setIsLoading(true);
 
     try {
       // Get conversation history for context
-      const conversationMessages: OllamaMessage[] = messages
+      const conversationMessages: OllamaMessage[] = currentSession.messages
         .slice(-10) // Keep last 10 messages for context
         .map(msg => ({ role: msg.role, content: msg.content }));
       
@@ -97,7 +105,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
         selectedLanguage
       );
 
-      const aiMessage: ChatMessage = {
+      const aiMessage: ChatMessageType = {
         id: generateMessageId(),
         role: 'assistant',
         content: response.message.content,
@@ -106,11 +114,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
         language: selectedLanguage
       };
 
-      setMessages(prev => [...prev, aiMessage]);
+      addMessage(currentSession.id, aiMessage);
     } catch (error) {
       console.error('Error sending message:', error);
       
-      const errorMessage: ChatMessage = {
+      const errorMessage: ChatMessageType = {
         id: generateMessageId(),
         role: 'assistant',
         content: selectedLanguage === 'it' 
@@ -121,7 +129,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
         language: selectedLanguage
       };
 
-      setMessages(prev => [...prev, errorMessage]);
+      addMessage(currentSession.id, errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -134,8 +142,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
     }
   };
 
-  const clearChat = () => {
-    setMessages([]);
+  const resetSelections = () => {
+    setSelectedModel('industrial-ai');
+    setSelectedLanguage('en');
   };
 
   const generateDocumentation = async (type: 'api' | 'user' | 'technical' | 'installation') => {
@@ -157,12 +166,24 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
     return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  if (!currentSession) {
+    return (
+      <div className={`chat-panel ${className}`}>
+        <div className="no-session-state">
+          <div className="no-session-icon">💬</div>
+          <h3>No Chat Session Selected</h3>
+          <p>Select a chat session from the sidebar or create a new one to start chatting.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`chat-panel ${className}`}>
-      {/* Header */}
+      {/* Enhanced Header */}
       <div className="chat-header">
         <div className="chat-title">
-          <h3>AI Industrial Assistant</h3>
+          <h3>{currentSession.title}</h3>
           <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
             <span className="status-indicator"></span>
             {isConnected 
@@ -174,108 +195,160 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
 
         <div className="chat-controls">
           {/* Language Selector */}
-          <select 
-            value={selectedLanguage} 
-            onChange={(e) => setSelectedLanguage(e.target.value as 'it' | 'en')}
-            className="language-selector"
-          >
-            <option value="en">🇬🇧 English</option>
-            <option value="it">🇮🇹 Italiano</option>
-          </select>
+          <div className="control-group">
+            <label>Language</label>
+            <select 
+              value={selectedLanguage} 
+              onChange={(e) => setSelectedLanguage(e.target.value as 'it' | 'en')}
+              className="language-selector"
+            >
+              <option value="en">🇬🇧 English</option>
+              <option value="it">🇮🇹 Italiano</option>
+            </select>
+          </div>
 
           {/* Model Selector */}
-          <select 
-            value={selectedModel} 
-            onChange={(e) => setSelectedModel(e.target.value)}
-            className="model-selector"
-          >
-            {INDUSTRIAL_MODELS.map(model => (
-              <option key={model.id} value={model.id}>
-                {model.name}
-              </option>
-            ))}
-          </select>
+          <div className="control-group">
+            <label>AI Model</label>
+            <select 
+              value={selectedModel} 
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className="model-selector"
+              title={getIndustrialModel(selectedModel)?.description}
+            >
+              <optgroup label="General">
+                {INDUSTRIAL_MODELS.filter(m => m.category === 'general').map(model => (
+                  <option key={model.id} value={model.id}>
+                    {model.name}
+                  </option>
+                ))}
+              </optgroup>
+              
+              <optgroup label="Automation">
+                {INDUSTRIAL_MODELS.filter(m => m.category === 'automation').map(model => (
+                  <option key={model.id} value={model.id}>
+                    {model.name}
+                  </option>
+                ))}
+              </optgroup>
+              
+              <optgroup label="PLC">
+                {INDUSTRIAL_MODELS.filter(m => m.category === 'plc').map(model => (
+                  <option key={model.id} value={model.id}>
+                    {model.name}
+                  </option>
+                ))}
+              </optgroup>
+              
+              <optgroup label="HMI">
+                {INDUSTRIAL_MODELS.filter(m => m.category === 'hmi').map(model => (
+                  <option key={model.id} value={model.id}>
+                    {model.name}
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
 
-          {/* Clear Chat Button */}
+          {/* Model Info Chip */}
+          {(() => {
+            const model = getIndustrialModel(selectedModel);
+            return model ? (
+              <div className="model-chip" title={model.description}>
+                <span className="chip-category">{model.category.toUpperCase()}</span>
+                <span className="chip-name">{model.name}</span>
+              </div>
+            ) : null;
+          })()}
+
+          {/* Clear Button */}
           <button 
-            onClick={clearChat} 
             className="clear-button"
-            disabled={messages.length === 0}
+            onClick={resetSelections}
+            title="Reset language and model selection"
           >
-            {selectedLanguage === 'it' ? 'Pulisci' : 'Clear'}
+            Clear
           </button>
         </div>
       </div>
 
-      {/* Documentation Generation Shortcuts */}
+      {/* Documentation Shortcuts */}
       <div className="documentation-shortcuts">
-        <span className="shortcuts-label">
-          {selectedLanguage === 'it' ? 'Genera documentazione:' : 'Generate documentation:'}
-        </span>
-        <button onClick={() => generateDocumentation('api')} className="doc-shortcut">API</button>
-        <button onClick={() => generateDocumentation('user')} className="doc-shortcut">
-          {selectedLanguage === 'it' ? 'Utente' : 'User'}
+        <span className="shortcuts-label">Quick docs:</span>
+        <button className="doc-shortcut" onClick={() => generateDocumentation('api')}>
+          API
         </button>
-        <button onClick={() => generateDocumentation('technical')} className="doc-shortcut">
-          {selectedLanguage === 'it' ? 'Tecnica' : 'Technical'}
+        <button className="doc-shortcut" onClick={() => generateDocumentation('user')}>
+          User
         </button>
-        <button onClick={() => generateDocumentation('installation')} className="doc-shortcut">
-          {selectedLanguage === 'it' ? 'Installazione' : 'Installation'}
+        <button className="doc-shortcut" onClick={() => generateDocumentation('technical')}>
+          Technical
+        </button>
+        <button className="doc-shortcut" onClick={() => generateDocumentation('installation')}>
+          Install
         </button>
       </div>
 
       {/* Messages */}
       <div className="chat-messages">
-        {messages.length === 0 && (
-          <div className="empty-state">
-            <div className="empty-icon">🤖</div>
-            <h4>{selectedLanguage === 'it' ? 'Assistente AI Industriale' : 'Industrial AI Assistant'}</h4>
-            <p>
-              {selectedLanguage === 'it' 
-                ? 'Chiedi qualsiasi cosa sui sistemi di automazione industriale, PLC, HMI e molto altro.'
-                : 'Ask anything about industrial automation systems, PLCs, HMIs, and more.'}
-            </p>
-            {!isConnected && (
-              <div className="connection-warning">
-                <p>
-                  {selectedLanguage === 'it' 
-                    ? '⚠️ Servizio Ollama non disponibile. Verifica che sia in esecuzione su localhost:11434'
-                    : '⚠️ Ollama service not available. Make sure it\'s running on localhost:11434'}
-                </p>
-              </div>
-            )}
+        {!isConnected && (
+          <div className="connection-warning">
+            <div className="warning-content">
+              <span className="warning-icon">⚠️</span>
+              <p>
+                {selectedLanguage === 'it'
+                  ? '⚠️ Servizio Ollama non disponibile. Verifica che sia in esecuzione su localhost:11434'
+                  : '⚠️ Ollama service not available. Make sure it\'s running on localhost:11434'}
+              </p>
+            </div>
           </div>
         )}
 
-        {messages.map((message) => (
-          <div key={message.id} className={`message ${message.role}`}>
-            <div className="message-header">
-              <span className="message-role">
-                {message.role === 'user' ? '👤' : '🤖'} 
-                {message.role === 'user' 
-                  ? (selectedLanguage === 'it' ? 'Tu' : 'You')
-                  : getIndustrialModel(message.model || '')?.name || 'AI Assistant'
-                }
-              </span>
-              <span className="message-timestamp">
-                {formatTimestamp(message.timestamp)}
-              </span>
-            </div>
-            <div className="message-content">
-              {message.content.split('\n').map((line, index) => (
-                <React.Fragment key={index}>
-                  {line}
-                  {index < message.content.split('\n').length - 1 && <br />}
-                </React.Fragment>
-              ))}
-            </div>
+        {currentSession.messages.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">🤖</div>
+            <h4>
+              {selectedLanguage === 'it' ? 'Inizia una conversazione' : 'Start a conversation'}
+            </h4>
+            <p>
+              {selectedLanguage === 'it' 
+                ? 'Digita un messaggio qui sotto per iniziare a chattare con l\'AI Assistant industriale.'
+                : 'Type a message below to start chatting with the industrial AI Assistant.'}
+            </p>
           </div>
-        ))}
+        ) : (
+          currentSession.messages.map((message) => (
+            <div key={message.id} className={`message ${message.role}`}>
+              <div className="message-header">
+                <span className="message-role">
+                  {message.role === 'user' ? '👤' : '🤖'} 
+                  {message.role === 'user' 
+                    ? (selectedLanguage === 'it' ? 'Tu' : 'You')
+                    : getIndustrialModel(message.model || '')?.name || 'AI Assistant'
+                  }
+                </span>
+                <span className="message-timestamp">
+                  {formatTimestamp(new Date(message.timestamp))}
+                </span>
+              </div>
+              <div className="message-content">
+                {message.content.split('\n').map((line, index) => (
+                  <React.Fragment key={index}>
+                    {line}
+                    {index < message.content.split('\n').length - 1 && <br />}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          ))
+        )}
 
         {isLoading && (
-          <div className="message assistant loading">
+          <div className="message loading">
             <div className="message-header">
-              <span className="message-role">🤖 AI Assistant</span>
+              <span className="message-role">
+                🤖 {getIndustrialModel(selectedModel)?.name || 'AI Assistant'}
+              </span>
             </div>
             <div className="message-content">
               <div className="typing-indicator">
@@ -286,7 +359,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
             </div>
           </div>
         )}
-
+        
         <div ref={messagesEndRef} />
       </div>
 
@@ -299,7 +372,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={
-              selectedLanguage === 'it' 
+              selectedLanguage === 'it'
                 ? 'Scrivi il tuo messaggio... (Enter per inviare, Shift+Enter per nuova riga)'
                 : 'Type your message... (Enter to send, Shift+Enter for new line)'
             }
