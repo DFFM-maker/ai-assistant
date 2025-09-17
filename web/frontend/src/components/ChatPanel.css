@@ -124,6 +124,15 @@
   border-color: var(--color-brand-primary);
 }
 
+/* Enhanced Model Selector */
+.model-selector-group {
+  min-width: 300px;
+}
+
+.chat-model-selector {
+  max-width: 100%;
+}
+
 .model-chip {
   display: flex;
   flex-direction: column;
