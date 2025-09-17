@@ -188,12 +188,16 @@ export function getRecommendedModelForQuery(query: string): EnhancedOllamaModel 
     return findModelById('hmi-designer') || findModelById('llama2-chat') || findModelById('mistral-instruct') || ENHANCED_OLLAMA_MODELS[0];
   }
   
-  // General category selection
-  if (isPlc || isCoding) {
+  // General category selection  
+  if (isCoding) {
+    return findModelById('magicoder') || findModelById('deepseek-coder') || findModelById('llama2-chat') || ENHANCED_OLLAMA_MODELS[0];
+  }
+  
+  if (isPlc) {
     return findModelById('deepseek-coder') || findModelById('magicoder') || findModelById('llama2-chat') || ENHANCED_OLLAMA_MODELS[0];
   }
   
-  // Default to general conversation model
+  // Default to general conversation model (llama2:13b-chat as specified)
   return findModelById('llama2-chat') || findModelById('mistral-instruct') || ENHANCED_OLLAMA_MODELS[0];
 }
 
