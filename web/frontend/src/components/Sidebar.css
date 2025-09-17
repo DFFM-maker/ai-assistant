@@ -156,8 +156,18 @@
   transition: all var(--transition-fast);
 }
 
+.user-profile.clickable {
+  cursor: pointer;
+}
+
 .user-profile:hover {
   background-color: var(--color-surface-hover);
+}
+
+.user-profile.clickable:hover {
+  background-color: var(--color-surface-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .user-avatar {
