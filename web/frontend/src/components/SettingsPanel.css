@@ -380,6 +380,24 @@
   }
 }
 
+/* Settings Footer */
+.footer-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.logout-btn {
+  background-color: var(--color-error, #dc3545) !important;
+  border-color: var(--color-error, #dc3545) !important;
+}
+
+.logout-btn:hover {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+}
+
 @media (max-width: 480px) {
   .settings-modal {
     width: 100%;
@@ -391,5 +409,13 @@
   
   .settings-header h2 {
     font-size: 20px;
+  }
+  
+  .footer-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .footer-actions .btn {
+    width: 100%;
   }
 }
