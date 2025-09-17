@@ -3,63 +3,64 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
 }
 
 .login-container {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-surface);
   padding: 48px;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   text-align: center;
   max-width: 400px;
   width: 100%;
-  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border-primary);
 }
 
 .login-container h1 {
-  color: #2d3748;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   font-size: 32px;
   font-weight: 700;
 }
 
 .login-container p {
-  color: #718096;
+  color: var(--color-text-secondary);
   margin-bottom: 32px;
   font-size: 16px;
   line-height: 1.5;
 }
 
-.demo-entry {
+.auth-entry {
   display: flex;
   justify-content: center;
 }
 
-.demo-button {
-  background: linear-gradient(45deg, #3b82f6, #2563eb);
-  color: #fff;
+.gitlab-button {
+  background: var(--color-brand-primary);
+  color: var(--color-text-inverse);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 16px 32px;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+  box-shadow: var(--shadow-md);
   min-width: 200px;
 }
 
-.demo-button:hover {
-  background: linear-gradient(45deg, #2563eb, #1d4ed8);
+.gitlab-button:hover {
+  background: var(--color-brand-secondary);
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.4);
+  box-shadow: var(--shadow-lg);
 }
 
-.demo-button:active {
+.gitlab-button:active {
   transform: translateY(0);
 }

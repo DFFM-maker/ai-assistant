@@ -152,14 +152,8 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
             <button 
               className="logout-btn"
               onClick={() => {
-                // Handle logout for demo users
-                if (localStorage.getItem('demo_user')) {
-                  localStorage.removeItem('demo_user');
-                  window.location.reload();
-                } else {
-                  // Handle logout for authenticated users
-                  window.location.href = 'http://192.168.1.250:4000/api/auth/logout';
-                }
+                // Handle logout for GitLab authenticated users
+                window.location.href = '/api/auth/logout';
               }}
               title="Logout"
             >
