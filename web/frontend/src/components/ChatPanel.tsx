@@ -19,13 +19,27 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Initialize from current session
+  // Initialize from current session and localStorage
   useEffect(() => {
+    // Load language from localStorage first
+    const savedLanguage = localStorage.getItem('ai-assistant-language') as 'it' | 'en';
+    if (savedLanguage && (savedLanguage === 'it' || savedLanguage === 'en')) {
+      setSelectedLanguage(savedLanguage);
+    }
+    
     if (currentSession) {
       setSelectedModel(currentSession.model);
-      setSelectedLanguage(currentSession.language);
+      // Only use session language if no localStorage preference exists
+      if (!savedLanguage) {
+        setSelectedLanguage(currentSession.language);
+      }
     }
   }, [currentSession]);
+
+  // Save language to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('ai-assistant-language', selectedLanguage);
+  }, [selectedLanguage]);
 
   // Check Ollama connection on mount
   useEffect(() => {
@@ -142,22 +156,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
     }
   };
 
-  const resetSelections = () => {
-    setSelectedModel('industrial-ai');
-    setSelectedLanguage('en');
-  };
-
-  const generateDocumentation = async (type: 'api' | 'user' | 'technical' | 'installation') => {
-    if (!isConnected) return;
-
-    const prompt = selectedLanguage === 'it' 
-      ? `Genera documentazione ${type} per il sistema AI Assistant industriale.`
-      : `Generate ${type} documentation for the industrial AI Assistant system.`;
-
-    setInputValue(prompt);
-    inputRef.current?.focus();
-  };
-
   const getIndustrialModel = (modelId: string): IndustrialAIModel | undefined => {
     return INDUSTRIAL_MODELS.find(model => model.id === modelId);
   };
@@ -216,14 +214,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
               className="model-selector"
               title={getIndustrialModel(selectedModel)?.description}
             >
-              <optgroup label="General">
-                {INDUSTRIAL_MODELS.filter(m => m.category === 'general').map(model => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))}
-              </optgroup>
-              
               <optgroup label="Automation">
                 {INDUSTRIAL_MODELS.filter(m => m.category === 'automation').map(model => (
                   <option key={model.id} value={model.id}>
@@ -260,33 +250,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
               </div>
             ) : null;
           })()}
-
-          {/* Clear Button */}
-          <button 
-            className="clear-button"
-            onClick={resetSelections}
-            title="Reset language and model selection"
-          >
-            Clear
-          </button>
         </div>
-      </div>
-
-      {/* Documentation Shortcuts */}
-      <div className="documentation-shortcuts">
-        <span className="shortcuts-label">Quick docs:</span>
-        <button className="doc-shortcut" onClick={() => generateDocumentation('api')}>
-          API
-        </button>
-        <button className="doc-shortcut" onClick={() => generateDocumentation('user')}>
-          User
-        </button>
-        <button className="doc-shortcut" onClick={() => generateDocumentation('technical')}>
-          Technical
-        </button>
-        <button className="doc-shortcut" onClick={() => generateDocumentation('installation')}>
-          Install
-        </button>
       </div>
 
       {/* Messages */}

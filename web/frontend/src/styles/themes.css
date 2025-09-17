@@ -1,11 +1,11 @@
-/* Claude.ai / GitHub Copilot inspired theme system */
+/* GitHub Copilot inspired theme system */
 
 :root {
-  /* Typography */
-  --font-family-sans: 'Inter', 'Segoe UI', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-family-mono: 'Monaco', 'SF Mono', 'Menlo', 'Consolas', 'Liberation Mono', monospace;
+  /* Typography - GitHub Copilot style */
+  --font-family-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  --font-family-mono: ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Monaco, 'Cascadia Code', 'Roboto Mono', 'Courier New', monospace;
   
-  /* Spacing */
+  /* Spacing - GitHub Copilot optimized */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
@@ -13,138 +13,138 @@
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
   
-  /* Border radius */
-  --radius-sm: 4px;
+  /* Border radius - GitHub style */
+  --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  /* Shadows - GitHub Copilot style */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.10);
   
-  /* Animation */
-  --transition-fast: 150ms ease-in-out;
-  --transition-normal: 200ms ease-in-out;
-  --transition-slow: 300ms ease-in-out;
+  /* Transitions - GitHub smooth */
+  --transition-fast: 0.12s cubic-bezier(0.02, 1.3, 0.8, 1);
+  --transition-normal: 0.2s cubic-bezier(0.02, 1.3, 0.8, 1);
+  --transition-slow: 0.3s cubic-bezier(0.02, 1.3, 0.8, 1);
 }
 
-/* Light theme variables */
+/* Light theme variables (GitHub Copilot style) */
 [data-theme="light"] {
-  /* Background colors */
+  /* Background colors - GitHub light */
   --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f8f9fa;
+  --color-bg-secondary: #f6f8fa;
   --color-bg-tertiary: #f1f3f4;
   --color-bg-elevated: #ffffff;
   --color-bg-overlay: rgba(255, 255, 255, 0.95);
   
-  /* Surface colors */
+  /* Surface colors - GitHub style */
   --color-surface: #ffffff;
-  --color-surface-variant: #f8f9fa;
+  --color-surface-variant: #f6f8fa;
   --color-surface-hover: #f1f3f4;
-  --color-surface-active: #e8eaed;
+  --color-surface-active: #eaeef2;
   
-  /* Text colors */
-  --color-text-primary: #1f2937;
-  --color-text-secondary: #6b7280;
-  --color-text-tertiary: #9ca3af;
+  /* Text colors - GitHub optimized */
+  --color-text-primary: #24292f;
+  --color-text-secondary: #656d76;
+  --color-text-tertiary: #8c959f;
   --color-text-inverse: #ffffff;
-  --color-text-accent: #2563eb;
+  --color-text-accent: #0969da;
   
-  /* Border colors */
-  --color-border-primary: #e5e7eb;
-  --color-border-secondary: #d1d5db;
-  --color-border-focus: #3b82f6;
+  /* Border colors - GitHub subtle */
+  --color-border-primary: #d0d7de;
+  --color-border-secondary: #d8dee4;
+  --color-border-focus: #0969da;
   
-  /* Brand colors */
-  --color-brand-primary: #2563eb;
-  --color-brand-secondary: #1d4ed8;
-  --color-brand-tertiary: #1e40af;
+  /* Brand colors - GitHub Copilot palette */
+  --color-brand-primary: #0969da;
+  --color-brand-secondary: #0550ae;
+  --color-brand-tertiary: #023f88;
   
-  /* Status colors */
-  --color-success: #10b981;
-  --color-success-bg: #ecfdf5;
-  --color-warning: #f59e0b;
-  --color-warning-bg: #fffbeb;
-  --color-error: #ef4444;
-  --color-error-bg: #fef2f2;
-  --color-info: #3b82f6;
-  --color-info-bg: #eff6ff;
+  /* Status colors - GitHub style */
+  --color-success: #1a7f37;
+  --color-success-bg: #dcfdf7;
+  --color-warning: #bf8700;
+  --color-warning-bg: #fef3cd;
+  --color-error: #cf222e;
+  --color-error-bg: #ffebe9;
+  --color-info: #0969da;
+  --color-info-bg: #ddf4ff;
   
-  /* Sidebar & Navigation */
-  --color-sidebar-bg: #f8f9fa;
-  --color-sidebar-text: #374151;
-  --color-sidebar-hover: #e5e7eb;
-  --color-sidebar-active: #e5e7eb;
+  /* Sidebar & Navigation - GitHub Copilot style */
+  --color-sidebar-bg: #f6f8fa;
+  --color-sidebar-text: #656d76;
+  --color-sidebar-hover: #f1f3f4;
+  --color-sidebar-active: #ddf4ff;
   
-  /* Header */
+  /* Header - GitHub style */
   --color-header-bg: #ffffff;
-  --color-header-border: #e5e7eb;
+  --color-header-border: #d0d7de;
   
-  /* Chat panel */
+  /* Chat panel - GitHub Copilot optimized */
   --color-chat-bg: #ffffff;
-  --color-chat-input-bg: #f9fafb;
-  --color-chat-message-user: #eff6ff;
-  --color-chat-message-ai: #f9fafb;
+  --color-chat-input-bg: #f6f8fa;
+  --color-chat-message-user: #ddf4ff;
+  --color-chat-message-ai: #f6f8fa;
 }
 
-/* Dark theme variables */
+/* Dark theme variables (GitHub Copilot dark) */
 [data-theme="dark"] {
-  /* Background colors */
-  --color-bg-primary: #0f172a;
-  --color-bg-secondary: #1e293b;
-  --color-bg-tertiary: #334155;
-  --color-bg-elevated: #1e293b;
-  --color-bg-overlay: rgba(15, 23, 42, 0.95);
+  /* Background colors - GitHub dark */
+  --color-bg-primary: #0d1117;
+  --color-bg-secondary: #161b22;
+  --color-bg-tertiary: #21262d;
+  --color-bg-elevated: #161b22;
+  --color-bg-overlay: rgba(13, 17, 23, 0.95);
   
-  /* Surface colors */
-  --color-surface: #1e293b;
-  --color-surface-variant: #334155;
-  --color-surface-hover: #475569;
-  --color-surface-active: #64748b;
+  /* Surface colors - GitHub dark style */
+  --color-surface: #161b22;
+  --color-surface-variant: #21262d;
+  --color-surface-hover: #30363d;
+  --color-surface-active: #373e47;
   
-  /* Text colors */
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #cbd5e1;
-  --color-text-tertiary: #94a3b8;
-  --color-text-inverse: #0f172a;
-  --color-text-accent: #60a5fa;
+  /* Text colors - GitHub dark optimized */
+  --color-text-primary: #f0f6fc;
+  --color-text-secondary: #8b949e;
+  --color-text-tertiary: #6e7681;
+  --color-text-inverse: #24292f;
+  --color-text-accent: #58a6ff;
   
-  /* Border colors */
-  --color-border-primary: #334155;
-  --color-border-secondary: #475569;
-  --color-border-focus: #3b82f6;
+  /* Border colors - GitHub dark subtle */
+  --color-border-primary: #30363d;
+  --color-border-secondary: #373e47;
+  --color-border-focus: #58a6ff;
   
-  /* Brand colors */
-  --color-brand-primary: #3b82f6;
-  --color-brand-secondary: #2563eb;
-  --color-brand-tertiary: #1d4ed8;
+  /* Brand colors - GitHub Copilot dark */
+  --color-brand-primary: #58a6ff;
+  --color-brand-secondary: #388bfd;
+  --color-brand-tertiary: #316dca;
   
-  /* Status colors */
-  --color-success: #10b981;
-  --color-success-bg: #064e3b;
-  --color-warning: #f59e0b;
-  --color-warning-bg: #78350f;
-  --color-error: #ef4444;
-  --color-error-bg: #7f1d1d;
-  --color-info: #3b82f6;
-  --color-info-bg: #1e3a8a;
+  /* Status colors - GitHub dark */
+  --color-success: #3fb950;
+  --color-success-bg: #0f2419;
+  --color-warning: #d29922;
+  --color-warning-bg: #332b00;
+  --color-error: #f85149;
+  --color-error-bg: #4c0519;
+  --color-info: #58a6ff;
+  --color-info-bg: #0c2d6b;
   
-  /* Sidebar & Navigation */
-  --color-sidebar-bg: #1e293b;
-  --color-sidebar-text: #cbd5e1;
-  --color-sidebar-hover: #334155;
-  --color-sidebar-active: #475569;
+  /* Sidebar & Navigation - GitHub dark */
+  --color-sidebar-bg: #161b22;
+  --color-sidebar-text: #8b949e;
+  --color-sidebar-hover: #21262d;
+  --color-sidebar-active: #0d419d;
   
-  /* Header */
-  --color-header-bg: #1e293b;
-  --color-header-border: #334155;
+  /* Header - GitHub dark */
+  --color-header-bg: #161b22;
+  --color-header-border: #30363d;
   
-  /* Chat panel */
-  --color-chat-bg: #1e293b;
-  --color-chat-input-bg: #334155;
-  --color-chat-message-user: #1e3a8a;
-  --color-chat-message-ai: #334155;
+  /* Chat panel - GitHub dark */
+  --color-chat-bg: #0d1117;
+  --color-chat-input-bg: #21262d;
+  --color-chat-message-user: #0c2d6b;
+  --color-chat-message-ai: #21262d;
 }
 
 /* Base styles */
