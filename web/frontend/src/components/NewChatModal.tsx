@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useChat } from '../hooks/useChat';
 import { INDUSTRIAL_MODELS } from '../services/ollamaService';
+import { findModelById } from '../services/ollama_models';
 import ModelSelector from './ModelSelector';
 import './NewChatModal.css';
 
@@ -18,11 +19,46 @@ const NewChatModal: React.FC<NewChatModalProps> = ({ isOpen, onClose, onChatCrea
   const [selectedGroupId, setSelectedGroupId] = useState('');
   const [isCreating, setIsCreating] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen && groups.length > 0 && !selectedGroupId) {
       setSelectedGroupId(groups[0].id);
     }
   }, [isOpen, groups, selectedGroupId]);
+
+  // Auto-select model based on group
+  useEffect(() => {
+    if (selectedGroupId) {
+      const group = getGroupById(selectedGroupId);
+      if (group) {
+        let autoSelectedModel = 'llama2-chat'; // default
+        
+        // According to requirements: coding -> magicoder/codellama, general -> llama2:13b-chat
+        if (group.name.toLowerCase().includes('general')) {
+          // For general purpose, use llama2-chat
+          autoSelectedModel = 'llama2-chat';
+        } else if (group.name.toLowerCase().includes('automation') || 
+                  group.name.toLowerCase().includes('coding') ||
+                  group.name.toLowerCase().includes('development')) {
+          // For coding/automation, prefer magicoder first, then codellama
+          const magicoder = findModelById('magicoder');
+          const codellama = findModelById('codellama');
+          if (magicoder) {
+            autoSelectedModel = 'magicoder';
+          } else if (codellama) {
+            autoSelectedModel = 'codellama';
+          }
+        } else if (group.name.toLowerCase().includes('documentation')) {
+          // For documentation, use doc-generator
+          const docGen = findModelById('doc-generator');
+          if (docGen) {
+            autoSelectedModel = 'doc-generator';
+          }
+        }
+        
+        setSelectedModel(autoSelectedModel);
+      }
+    }
+  }, [selectedGroupId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
