@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { EnhancedOllamaModel, MODEL_CATEGORIES } from '../services/ollama_models';
 import { ollamaService } from '../services/ollamaService';
+import Tooltip from './Tooltip';
 import './ModelSelector.css';
 
 interface ModelSelectorProps {
@@ -141,42 +142,47 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                     <span className="category-count">({categoryModels.length})</span>
                   </div>
                   
-                  {categoryModels.map(model => (
-                    <div
-                      key={model.id}
-                      className={`model-option ${model.id === selectedModel ? 'selected' : ''} ${!model.available ? 'unavailable' : ''}`}
-                      onClick={() => handleModelSelect(model.id)}
-                    >
-                      <div className="model-option-main">
-                        <div className="model-option-header">
-                          <span className="model-option-name">{model.name}</span>
-                          <div className="model-badges">
-                            {model.recommended && <span className="badge recommended">⭐ Recommended</span>}
-                            {showAvailabilityStatus && (
-                              <span className={`badge availability ${model.available ? 'available' : 'unavailable'}`}>
-                                {model.available ? '✅ Available' : '❌ Not Installed'}
-                              </span>
+                  {categoryModels.map(model => {
+                    const tooltipContent = `${model.description}\n\nUse Cases:\n${model.use_case.join(', ')}\n\nLanguage: ${model.lingua === 'both' ? 'English & Italian' : model.lingua === 'en' ? 'English' : 'Italian'}\n\nCategory: ${MODEL_CATEGORIES[model.categoria].label}${model.size ? `\nSize: ${model.size}` : ''}${model.ollama_model_name ? `\nOllama Model: ${model.ollama_model_name}` : ''}`;
+                    
+                    return (
+                      <Tooltip key={model.id} content={tooltipContent} position="right">
+                        <div
+                          className={`model-option ${model.id === selectedModel ? 'selected' : ''} ${!model.available ? 'unavailable' : ''}`}
+                          onClick={() => handleModelSelect(model.id)}
+                        >
+                          <div className="model-option-main">
+                            <div className="model-option-header">
+                              <span className="model-option-name">{model.name}</span>
+                              <div className="model-badges">
+                                {model.recommended && <span className="badge recommended">⭐ Recommended</span>}
+                                {showAvailabilityStatus && (
+                                  <span className={`badge availability ${model.available ? 'available' : 'unavailable'}`}>
+                                    {model.available ? '✅ Available' : '❌ Not Installed'}
+                                  </span>
+                                )}
+                                {model.size && <span className="badge size">{model.size}</span>}
+                              </div>
+                            </div>
+                            <p className="model-description">{model.description}</p>
+                            
+                            {!model.available && model.ollama_model_name && (
+                              <div className="install-suggestion">
+                                <span className="install-text">Non disponibile. Scarica con: </span>
+                                <code className="install-command">ollama pull {model.ollama_model_name}</code>
+                              </div>
                             )}
-                            {model.size && <span className="badge size">{model.size}</span>}
+                            
+                            <div className="model-tags">
+                              {model.tags.map(tag => (
+                                <span key={tag} className="tag">{tag}</span>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                        <p className="model-description">{model.description}</p>
-                        
-                        {!model.available && model.ollama_model_name && (
-                          <div className="install-suggestion">
-                            <span className="install-text">Install with: </span>
-                            <code className="install-command">ollama pull {model.ollama_model_name}</code>
-                          </div>
-                        )}
-                        
-                        <div className="model-tags">
-                          {model.tags.map(tag => (
-                            <span key={tag} className="tag">{tag}</span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                      </Tooltip>
+                    );
+                  })}
                 </div>
               ))
             )}

@@ -5,26 +5,35 @@
   transition: background-color var(--transition-normal);
 }
 
-.main-content {
+.content-area {
   flex: 1;
   margin-left: 280px; /* Sidebar width */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
   padding: var(--spacing-xl);
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
-  min-height: 100vh;
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
 /* Responsive adjustments */
 @media (max-width: 1200px) {
-  .main-content {
+  .content-area {
     /* Remove version panel margin adjustments */
   }
 }
 
 @media (max-width: 768px) {
-  .main-content {
+  .content-area {
     margin-left: 60px; /* Collapsed sidebar */
+  }
+  
+  .main-content {
     padding: var(--spacing-md);
   }
 }
