@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useUser } from './hooks/useUser';
 import { ThemeProvider } from './hooks/useTheme';
@@ -12,14 +12,7 @@ import './styles/themes.css';
 import './styles.css';
 
 function App() {
-  const { user, loading, setUser } = useUser(); // setUser aggiunto!
-
-  // Redirect automatico a GitLab se non autenticato
-  useEffect(() => {
-    if (!loading && !user) {
-      window.location.href = 'http://192.168.1.250:4000/api/auth/gitlab';
-    }
-  }, [user, loading]);
+  const { user, loading, setUser } = useUser();
 
   // Logout function
   const handleLogout = async () => {
@@ -31,11 +24,10 @@ function App() {
     } catch (error) {
       console.error('Logout error:', error);
     }
-    setUser(null); // <-- Questo azzera lo stato utente!
-    window.location.href = 'http://192.168.1.250:4000/api/auth/gitlab';
+    setUser(null);
+    window.location.href = '/';
   };
 
-  // Show spinner during initial load
   if (loading) {
     return (
       <ThemeProvider>
@@ -49,18 +41,17 @@ function App() {
       <ChatProvider>
         <Router>
           <Routes>
-            {/* Eliminata la pagina di login */}
             <Route
               path="/"
               element={
                 <ProtectedRoute user={user} loading={loading}>
-                  <Layout user={user} onLogout={handleLogout} />
+                  <Layout user={user!} onLogout={handleLogout} />
                 </ProtectedRoute>
               }
             >
-              <Route index element={user ? <Dashboard user={user} /> : <div />} />
-              <Route path="dashboard" element={user ? <Dashboard user={user} /> : <div />} />
-              <Route path="chat" element={user ? <ChatPanel /> : <div />} />
+              <Route index element={<Dashboard user={user!} />} />
+              <Route path="dashboard" element={<Dashboard user={user!} />} />
+              <Route path="chat" element={<ChatPanel />} />
               {/* Add more protected routes here as needed */}
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

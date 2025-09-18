@@ -18,7 +18,8 @@ export const useUser = (): UserContextType & { setUser: typeof setUser } => {
 
       if (response.ok) {
         const userData = await response.json();
-        setUser(userData);
+        // PATCH: normalizza il valore di user!
+        setUser(userData.user ?? null);
       } else {
         setUser(null);
       }
@@ -38,6 +39,6 @@ export const useUser = (): UserContextType & { setUser: typeof setUser } => {
     user,
     loading,
     refetch: fetchUser,
-    setUser, // <-- Aggiunto qui!
+    setUser,
   };
 };
