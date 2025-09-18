@@ -23,15 +23,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
 
   // Initialize from current session and localStorage
   useEffect(() => {
-    // Load language from localStorage first
     const savedLanguage = localStorage.getItem('ai-assistant-language') as 'it' | 'en';
     if (savedLanguage && (savedLanguage === 'it' || savedLanguage === 'en')) {
       setSelectedLanguage(savedLanguage);
     }
-    
+
     if (currentSession) {
       setSelectedModel(currentSession.model);
-      // Only use session language if no localStorage preference exists
       if (!savedLanguage) {
         setSelectedLanguage(currentSession.language);
       }
@@ -49,7 +47,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
       try {
         const health = await ollamaService.checkHealth();
         setIsConnected(health);
-        
         if (health) {
           const models = await ollamaService.getAvailableModels();
           setAvailableModels(models);
@@ -61,8 +58,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
     };
 
     checkConnection();
-    
-    // Check connection every 30 seconds
     const interval = setInterval(checkConnection, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -72,15 +67,23 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [currentSession?.messages]);
 
-  // Update session when model or language changes
+  // FIX UPDATE DEPTH
+  // Aggiorna session solo se davvero serve, e non se è già allineata!
   useEffect(() => {
-    if (currentSession && (currentSession.model !== selectedModel || currentSession.language !== selectedLanguage)) {
+    if (
+      currentSession &&
+      (
+        currentSession.model !== selectedModel ||
+        currentSession.language !== selectedLanguage
+      )
+    ) {
       updateSession(currentSession.id, {
         model: selectedModel,
         language: selectedLanguage,
       });
     }
-  }, [selectedModel, selectedLanguage, currentSession, updateSession]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedModel, selectedLanguage, updateSession, currentSession?.id]);
 
   const generateMessageId = (): string => {
     return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -88,21 +91,17 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!inputValue.trim() || isLoading || !isConnected || !currentSession) {
       return;
     }
-
-    // Auto-recommend model based on query if current model is a default one
     let modelToUse = selectedModel;
     if (selectedModel === 'llama2-chat' || selectedModel === 'industrial-ai') {
       const recommendedModel = getRecommendedModelForQuery(inputValue);
       if (recommendedModel) {
         modelToUse = recommendedModel.id;
-        setSelectedModel(modelToUse); // Update UI to show recommended model
+        setSelectedModel(modelToUse);
       }
     }
-
     const userMessage: ChatMessageType = {
       id: generateMessageId(),
       role: 'user',
@@ -111,29 +110,21 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
       model: modelToUse,
       language: selectedLanguage
     };
-
     addMessage(currentSession.id, userMessage);
     setInputValue('');
     setIsLoading(true);
 
     try {
-      // Get conversation history for context
       const conversationMessages: OllamaMessage[] = currentSession.messages
-        .slice(-10) // Keep last 10 messages for context
+        .slice(-10)
         .map(msg => ({ role: msg.role, content: msg.content }));
-      
       conversationMessages.push({ role: 'user', content: userMessage.content });
-
-      // Get the actual Ollama model name to use
       const ollamaModelName = ollamaService.getOllamaModelName(modelToUse);
-
-      // Send to Ollama
       const response = await ollamaService.sendMessage(
         ollamaModelName,
         conversationMessages,
         selectedLanguage
       );
-
       const aiMessage: ChatMessageType = {
         id: generateMessageId(),
         role: 'assistant',
@@ -142,22 +133,19 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
         model: modelToUse,
         language: selectedLanguage
       };
-
       addMessage(currentSession.id, aiMessage);
     } catch (error) {
       console.error('Error sending message:', error);
-      
       const errorMessage: ChatMessageType = {
         id: generateMessageId(),
         role: 'assistant',
-        content: selectedLanguage === 'it' 
+        content: selectedLanguage === 'it'
           ? `Errore: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`
           : `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
         timestamp: new Date(),
         model: selectedModel,
         language: selectedLanguage
       };
-
       addMessage(currentSession.id, errorMessage);
     } finally {
       setIsLoading(false);
@@ -199,19 +187,17 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
           <h3>{currentSession.title}</h3>
           <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
             <span className="status-indicator"></span>
-            {isConnected 
+            {isConnected
               ? (selectedLanguage === 'it' ? 'Connesso' : 'Connected')
               : (selectedLanguage === 'it' ? 'Disconnesso' : 'Disconnected')
             }
           </div>
         </div>
-
         <div className="chat-controls">
-          {/* Language Selector */}
           <div className="control-group">
             <label>Language</label>
-            <select 
-              value={selectedLanguage} 
+            <select
+              value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value as 'it' | 'en')}
               className="language-selector"
             >
@@ -219,8 +205,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
               <option value="it">🇮🇹 Italiano</option>
             </select>
           </div>
-
-          {/* Enhanced Model Selector */}
           <div className="control-group model-selector-group">
             <label>AI Model</label>
             <ModelSelector
@@ -231,8 +215,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
           </div>
         </div>
       </div>
-
-      {/* Messages */}
       <div className="chat-messages">
         {!isConnected && (
           <div className="connection-warning">
@@ -246,7 +228,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
             </div>
           </div>
         )}
-
         {currentSession.messages.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">🤖</div>
@@ -254,7 +235,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
               {selectedLanguage === 'it' ? 'Inizia una conversazione' : 'Start a conversation'}
             </h4>
             <p>
-              {selectedLanguage === 'it' 
+              {selectedLanguage === 'it'
                 ? 'Digita un messaggio qui sotto per iniziare a chattare con l\'AI Assistant industriale.'
                 : 'Type a message below to start chatting with the industrial AI Assistant.'}
             </p>
@@ -264,8 +245,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
             <div key={message.id} className={`message ${message.role}`}>
               <div className="message-header">
                 <span className="message-role">
-                  {message.role === 'user' ? '👤' : '🤖'} 
-                  {message.role === 'user' 
+                  {message.role === 'user' ? '👤' : '🤖'}
+                  {message.role === 'user'
                     ? (selectedLanguage === 'it' ? 'Tu' : 'You')
                     : getIndustrialModel(message.model || '')?.name || 'AI Assistant'
                   }
@@ -285,7 +266,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
             </div>
           ))
         )}
-
         {isLoading && (
           <div className="message loading">
             <div className="message-header">
@@ -302,11 +282,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
             </div>
           </div>
         )}
-        
         <div ref={messagesEndRef} />
       </div>
-
-      {/* Input Form */}
       <form onSubmit={handleSubmit} className="chat-input-form">
         <div className="input-container">
           <textarea
@@ -323,8 +300,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
             rows={1}
             disabled={!isConnected}
           />
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="send-button"
             disabled={!inputValue.trim() || isLoading || !isConnected}
           >

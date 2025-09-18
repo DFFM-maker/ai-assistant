@@ -1,8 +1,8 @@
-import { 
-  ENHANCED_OLLAMA_MODELS, 
-  EnhancedOllamaModel, 
-  getAvailableModelMapping, 
-  getRecommendedModelForQuery 
+import {
+  ENHANCED_OLLAMA_MODELS,
+  EnhancedOllamaModel,
+  getAvailableModelMapping,
+  getRecommendedModelForQuery
 } from './ollama_models';
 
 export interface OllamaMessage {
@@ -97,7 +97,7 @@ export class OllamaService {
   private baseUrl: string;
   private timeout: number;
 
-  constructor(baseUrl: string = 'http://localhost:11434', timeout: number = 30000) {
+  constructor(baseUrl: string = 'http://192.168.1.250:11434', timeout: number = 30000) {
     this.baseUrl = baseUrl;
     this.timeout = timeout;
   }
@@ -117,12 +117,12 @@ export class OllamaService {
     try {
       // Add language context to system message if not already present
       const systemMessage = messages.find(m => m.role === 'system');
-      const languageContext = language === 'it' 
+      const languageContext = language === 'it'
         ? 'Rispondi sempre in italiano. Fornisci spiegazioni dettagliate e tecniche quando necessario.'
         : 'Always respond in English. Provide detailed technical explanations when necessary.';
-      
-      const enhancedMessages = systemMessage 
-        ? messages 
+
+      const enhancedMessages = systemMessage
+        ? messages
         : [{ role: 'system' as const, content: languageContext }, ...messages];
 
       const requestData: OllamaRequest = {
@@ -188,7 +188,7 @@ export class OllamaService {
       if (!response.ok) {
         throw new Error('Failed to fetch models');
       }
-      
+
       const data = await response.json();
       return data.models?.map((model: any) => model.name) || [];
     } catch (error) {
@@ -225,7 +225,7 @@ export class OllamaService {
     const messages: OllamaMessage[] = [
       {
         role: 'system',
-        content: language === 'it' 
+        content: language === 'it'
           ? 'Sei un esperto in documentazione tecnica industriale. Genera documentazione chiara, strutturata e professionale in formato Markdown.'
           : 'You are an expert in industrial technical documentation. Generate clear, structured, and professional documentation in Markdown format.'
       },
@@ -245,7 +245,7 @@ export class OllamaService {
   async getEnhancedModelsWithAvailability(): Promise<(EnhancedOllamaModel & { available: boolean })[]> {
     try {
       const installedModels = await this.getAvailableModels();
-      
+
       return ENHANCED_OLLAMA_MODELS.map(model => ({
         ...model,
         available: model.ollama_model_name ? installedModels.includes(model.ollama_model_name) : false
@@ -284,7 +284,7 @@ export class OllamaService {
     if (enhancedModel?.ollama_model_name) {
       return enhancedModel.ollama_model_name;
     }
-    
+
     // Fallback to legacy mapping or default
     return this.getRecommendedModel(enhancedModelId);
   }
@@ -294,7 +294,7 @@ export class OllamaService {
    */
   getRecommendedModel(query: string): string {
     const queryLower = query.toLowerCase();
-    
+
     if (queryLower.includes('sysmac') || queryLower.includes('omron')) {
       return 'deepseek-coder:6.7b';
     }
@@ -310,7 +310,7 @@ export class OllamaService {
     if (queryLower.includes('code') || queryLower.includes('programming')) {
       return 'magicoder:7b-s-cl';
     }
-    
+
     return 'llama2:13b-chat';
   }
 }

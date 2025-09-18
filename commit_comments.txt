@@ -1,0 +1,54 @@
+1468522 DFFM-maker Wed Sep 17 13:20:08 2025 +0200 Merge pull request #20 from DFFM-maker/copilot/fix-7b06e7c9-d019-4087-9934-fce8602d8092
+bcc4c17 copilot-swe-agent[bot] Wed Sep 17 11:15:33 2025 +0000 Complete ModelSelector enhancement with tooltips and layout improvements
+9232c4d copilot-swe-agent[bot] Wed Sep 17 11:12:04 2025 +0000 Implement GitLab-only auth and GitHub Copilot dark theme
+6ae209c DFFM-maker Wed Sep 17 13:04:43 2025 +0200 Merge pull request #19 from DFFM-maker/copilot/fix-7b06e7c9-d019-4087-9934-fce8602d8092
+1407204 copilot-swe-agent[bot] Wed Sep 17 11:04:09 2025 +0000 Initial plan
+722b201 DFFM-maker Wed Sep 17 12:38:38 2025 +0200 Merge pull request #17 from DFFM-maker/copilot/fix-4992b5ba-e153-4763-997c-8a0277cebee3
+b81b744 copilot-swe-agent[bot] Wed Sep 17 10:34:07 2025 +0000 Complete Phase 3-6: Model refactor, GPT selector, auto-selection, and testing
+21f1b38 copilot-swe-agent[bot] Wed Sep 17 10:23:24 2025 +0000 Complete Phase 1-2: Demo entry point and logout integration
+e2eacba DFFM-maker Wed Sep 17 12:17:44 2025 +0200 Merge pull request #16 from DFFM-maker/copilot/fix-4992b5ba-e153-4763-997c-8a0277cebee3
+9ecc5cc copilot-swe-agent[bot] Wed Sep 17 10:17:05 2025 +0000 Initial plan
+fefc8b1 DFFM-maker Wed Sep 17 11:34:19 2025 +0200 Merge pull request #15 from DFFM-maker/copilot/fix-74e0aecc-87e2-4d71-82bd-b801bc31f6d3
+e7d20ca copilot-swe-agent[bot] Wed Sep 17 09:20:59 2025 +0000 Implement GitHub Copilot styling: remove header, update colors, remove unwanted features
+7c5a0da DFFM-maker Wed Sep 17 11:09:38 2025 +0200 Merge pull request #14 from DFFM-maker/copilot/fix-74e0aecc-87e2-4d71-82bd-b801bc31f6d3
+dcd4120 copilot-swe-agent[bot] Wed Sep 17 09:09:11 2025 +0000 Initial plan
+e68de25 DFFM-maker Wed Sep 17 10:41:06 2025 +0200 Merge pull request #13 from DFFM-maker/copilot/fix-5ba86cff-a0b9-4ab0-bb08-925ee19b1d5c
+9e263c7 copilot-swe-agent[bot] Wed Sep 17 08:32:58 2025 +0000 Implement comprehensive user settings panel with avatar upload, email management, and localStorage persistence
+b1c418e DFFM-maker Wed Sep 17 10:22:20 2025 +0200 Merge pull request #12 from DFFM-maker/copilot/fix-5ba86cff-a0b9-4ab0-bb08-925ee19b1d5c
+8ccfe66 copilot-swe-agent[bot] Wed Sep 17 08:19:22 2025 +0000 Initial plan
+056a07c DFFM-maker Wed Sep 17 09:42:36 2025 +0200 Merge pull request #11 from DFFM-maker/copilot/fix-8d1e5fc4-c635-4fff-b932-9a19623071c7
+ba5d49c copilot-swe-agent[bot] Wed Sep 17 07:36:01 2025 +0000 Add demo mode and finalize comprehensive AI Assistant features implementation
+19f3736 copilot-swe-agent[bot] Wed Sep 17 07:30:19 2025 +0000 Implement core chat management features with enhanced UI
+8154f7b DFFM-maker Wed Sep 17 09:16:06 2025 +0200 Merge pull request #10 from DFFM-maker/copilot/fix-8d1e5fc4-c635-4fff-b932-9a19623071c7
+ebb8b1a copilot-swe-agent[bot] Wed Sep 17 07:15:09 2025 +0000 Initial plan
+ed64d66 DFFM-maker Tue Sep 16 15:53:16 2025 +0200 Merge pull request #9 from DFFM-maker/copilot/fix-1a9e272f-23de-47db-91f5-f64d3a5b83fb
+251e073 copilot-swe-agent[bot] Tue Sep 16 13:37:17 2025 +0000 Implement comprehensive React boilerplate with AI chat, theme system, and version control
+ba5abdf DFFM-maker Tue Sep 16 15:24:04 2025 +0200 Merge pull request #8 from DFFM-maker/copilot/fix-1a9e272f-23de-47db-91f5-f64d3a5b83fb
+2e1c8d2 copilot-swe-agent[bot] Tue Sep 16 13:23:08 2025 +0000 Initial plan
+fa15bff DFFM-maker Tue Sep 16 14:41:46 2025 +0200 Merge pull request #7 from DFFM-maker/copilot/fix-6f606162-6a93-439a-a163-ad60b0e7683e
+19cef48 copilot-swe-agent[bot] Tue Sep 16 12:32:05 2025 +0000 Complete React Router refactor with Header, Sidebar, and protected routes
+10c5978 DFFM-maker Tue Sep 16 14:24:12 2025 +0200 Merge pull request #6 from DFFM-maker/copilot/fix-6f606162-6a93-439a-a163-ad60b0e7683e
+aae7a0a copilot-swe-agent[bot] Tue Sep 16 12:23:04 2025 +0000 Initial plan
+9abebc6 DFFM-maker Tue Sep 16 12:20:36 2025 +0000 modifiche login/logout
+c8e055e DFFM-maker Tue Sep 16 09:30:36 2025 +0200 Merge pull request #5 from DFFM-maker/copilot/fix-716577e0-11a0-40d2-baec-87d6e802f698
+f48bad0 copilot-swe-agent[bot] Tue Sep 16 07:20:34 2025 +0000 Complete implementation of user authentication status panel
+1cb17e2 copilot-swe-agent[bot] Tue Sep 16 07:18:17 2025 +0000 Implement UserPanel component and useUser hook with TypeScript
+53725c8 copilot-swe-agent[bot] Tue Sep 16 07:14:55 2025 +0000 Initial exploration: Understanding current codebase structure
+347bff1 DFFM-maker Tue Sep 16 09:12:21 2025 +0200 Merge pull request #4 from DFFM-maker/copilot/fix-716577e0-11a0-40d2-baec-87d6e802f698
+7c13cdf copilot-swe-agent[bot] Tue Sep 16 07:11:43 2025 +0000 Initial plan
+6a32a8f DFFM-maker Tue Sep 16 08:58:34 2025 +0200 Merge pull request #3 from DFFM-maker/copilot/fix-695360ea-b38d-4931-bab2-43a3678a730b
+38f0325 copilot-swe-agent[bot] Tue Sep 16 06:56:06 2025 +0000 Initial plan
+625be6d DFFM-maker Tue Sep 16 08:51:33 2025 +0200 Revise CONTEXT.md for project setup and OAuthupdate
+10f651c DFFM-maker Tue Sep 16 08:50:35 2025 +0200 update
+fc890a1 DFFM-maker Tue Sep 16 08:38:41 2025 +0200 Merge pull request #2 from DFFM-maker/copilot/fix-4e273a8b-40e9-410e-8d32-932e8ebdeac8
+d2888b3 copilot-swe-agent[bot] Tue Sep 16 06:37:53 2025 +0000 Initial plan
+70f7521 DFFM-maker Tue Sep 16 06:23:36 2025 +0000 update web\backend
+f1090d8 DFFM-maker Mon Sep 15 15:51:25 2025 +0200 Merge pull request #1 from DFFM-maker/copilot/fix-1584faff-91bc-46a2-ad7e-dbcbb664eea6
+0257231 copilot-swe-agent[bot] Mon Sep 15 13:49:20 2025 +0000 Initial assessment of backend TypeScript configuration
+c36d296 copilot-swe-agent[bot] Mon Sep 15 13:47:17 2025 +0000 Initial plan
+b0646d3 DFFM-maker Mon Sep 15 13:44:52 2025 +0000 fine pomeriggio 15.44
+e8f40fd DFFM-maker Mon Sep 15 11:42:59 2025 +0000 push prima fase_1
+d9e6d2c DFFM-maker Mon Sep 15 11:35:55 2025 +0000 push prima fase
+028031f DFFM-maker Mon Sep 15 09:27:26 2025 +0000 new version
+1b83c27 DFFM-maker Sun Sep 14 06:24:15 2025 +0000 first commit
+fde93d4 DFFM-maker Sun Sep 14 06:14:28 2025 +0000 Initial commit: AI Assistant project setup
