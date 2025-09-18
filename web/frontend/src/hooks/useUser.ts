@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { User, UserContextType } from '../types/User';
 
-export const useUser = (): UserContextType => {
+export const useUser = (): UserContextType & { setUser: typeof setUser } => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchUser = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       const response = await fetch('/api/user', {
         credentials: 'include',
         headers: {
@@ -37,6 +37,7 @@ export const useUser = (): UserContextType => {
   return {
     user,
     loading,
-    refetch: fetchUser
+    refetch: fetchUser,
+    setUser, // <-- Aggiunto qui!
   };
 };

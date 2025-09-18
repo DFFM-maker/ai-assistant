@@ -42,7 +42,13 @@ passport.use(
 
 const router = express.Router();
 
-router.get('/auth/gitlab', passport.authenticate('gitlab', { scope: SCOPES }));
+router.get(
+  '/auth/gitlab',
+  passport.authenticate('gitlab', {
+    scope: SCOPES,
+    prompt: 'login'
+  })
+);
 
 router.get(
   '/auth/gitlab/callback',
@@ -57,19 +63,35 @@ router.get(
   }
 );
 
+// Middleware: non creare la sessione per richieste anonime su /user
+router.use('/user', (req, res, next) => {
+  // Non toccare req.session se non autenticato
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    return next();
+  }
+  next();
+});
+
+// Logout: distruggi sessione e cancella cookie
 router.get('/auth/logout', (req: Request, res: Response) => {
+  console.log('>>> LOGOUT REQUEST ARRIVED <<<');
   req.logout(() => {
-    res.redirect('http://192.168.1.250:3000/');
+    req.session.destroy(() => {
+      console.log('Session destroyed');
+      res.clearCookie('connect.sid', { path: '/', expires: new Date(0) });
+      res.status(200).json({ message: 'Logout completato e sessione distrutta.' });
+    });
   });
 });
 
+// Utente: mai errore 500, restituisci { user: null } se non autenticato
 router.get('/user', (req: Request, res: Response) => {
   console.log('USER:', req.user);
   console.log('SESSION:', req.session);
   if (req.isAuthenticated && req.isAuthenticated() && req.user) {
     res.json(req.user);
   } else {
-    res.status(401).json({ error: 'not authenticated' });
+    res.status(200).json({ user: null }); // Niente errore 500!
   }
 });
 

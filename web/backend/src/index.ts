@@ -22,7 +22,8 @@ app.use(session({
     httpOnly: true,
     secure: false,
     sameSite: 'lax',
-    maxAge: 24 * 60 * 60 * 1000
+    maxAge: 24 * 60 * 60 * 1000,
+    path: '/', // esplicito per sicurezza
   }
 }));
 
@@ -40,15 +41,21 @@ app.get('/', (req, res) => {
   res.send('Backend Express funzionante!');
 });
 
-// Endpoint logout API lato server
+// Endpoint logout API lato server: distrugge sessione e cancella cookie
 app.get('/api/auth/logout', (req, res, next) => {
-  // Passport >= 0.6.0: logout accetta una callback
+  console.log('>>> LOGOUT REQUEST ARRIVED <<<');
   req.logout(function (err) {
     if (err) {
       return next(err);
     }
-    // Risposta OK, non fare redirect!
-    res.status(200).json({ message: 'Logout dalla tua app completato.' });
+    req.session.destroy(function (err) {
+      if (err) {
+        return next(err);
+      }
+      // Forza la scadenza del cookie
+      res.clearCookie('connect.sid', { path: '/', expires: new Date(0) });
+      res.status(200).json({ message: 'Logout dalla tua app completato.' });
+    });
   });
 });
 

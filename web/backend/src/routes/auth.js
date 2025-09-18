@@ -11,7 +11,8 @@ router.get('/api/auth/logout', (req, res, next) => {
             if (err) {
                 return next(err);
             }
-            res.clearCookie('connect.sid');
+            // Assicurati di cancellare il cookie con la stessa 'path' usata da express-session!
+            res.clearCookie('connect.sid', { path: '/' }); // <-- AGGIUNTO path
             res.status(200).json({ message: 'Logout completato e sessione distrutta.' });
         });
     });
