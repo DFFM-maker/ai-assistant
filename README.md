@@ -2,8 +2,8 @@
 
 ## Descrizione
 
-AI Assistant per DFFM, progettato per integrazione locale con modelli Ollama e backend Express con autenticazione OAuth2 GitLab DFFM.  
-Supporta frontend React/Vue, versionamento Git, generazione codice industriale e chat AI.
+AI Assistant per DFFM, progettato per integrazione locale con modelli Ollama e backend Express.  
+Supporta frontend React, versionamento Git automatico tramite ai-bot, generazione codice industriale e chat AI.
 
 ---
 
@@ -14,7 +14,7 @@ Supporta frontend React/Vue, versionamento Git, generazione codice industriale e
 - npm
 - Python (per moduli AI, se richiesto)
 - Ollama con modelli scaricati (`llama2:13b-chat`, `magicoder:7b-s-cl`, `mistral:7b-instruct`, `deepseek-coder:6.7b`)
-- Istanza GitLab DFFM con OAuth2 abilitato
+- ai-bot configurato per versioning automatico
 
 ---
 
@@ -22,8 +22,8 @@ Supporta frontend React/Vue, versionamento Git, generazione codice industriale e
 
 - `/CONTEXT.md` → Stato e dipendenze del progetto
 - `/README.md` → Guida e onboarding
-- `/web/backend/` → Backend Express (OAuth2 GitLab DFFM)
-- `/web/frontend/` → Frontend React/Vue (skeleton app)
+- `/web/backend/` → Backend Express (senza autenticazione)
+- `/web/frontend/` → Frontend React
 - `/templates/`, `/scripts/`, `/logs/` → Utilità e gestione
 
 ---
@@ -60,28 +60,24 @@ Supporta frontend React/Vue, versionamento Git, generazione codice industriale e
    WantedBy=multi-user.target
    ```
 
-3. **Backend OAuth2 Express:**
-   - Configura variabili `.env` in `/web/backend/`:
-     ```
-     GITLAB_CLIENT_ID=xxxxxx
-     GITLAB_CLIENT_SECRET=yyyyyy
-     GITLAB_BASE_URL=https://gitlab.dffm.it
-     GITLAB_CALLBACK_URL=http://localhost:4000/api/auth/gitlab/callback
-     GITLAB_SCOPES=read_user,read_api,api
-     SECRET_KEY=una-stringa-segreta-molto-lunga-e-complessa
-     NODE_ENV=development
-     ```
-   - Endpoints attivi: `/api/auth/gitlab`, `/api/auth/gitlab/callback`, `/api/auth/logout`, `/api/user`
+3. **Backend Express (senza autenticazione):**
+   - Il backend ora funziona senza autenticazione
+   - Tutti i versioning vengono gestiti automaticamente tramite ai-bot
+   - Endpoints rimossi: `/api/auth/gitlab`, `/api/auth/gitlab/callback`, `/api/auth/logout`, `/api/user`
+   - Endpoints attivi: solo `/api/git` per operazioni Git
 
-4. **Front-end Skeleton:**
-   - React (consigliato): layout con sidebar, pannello versioning, routing base, struttura consigliata (`components`, `services`, `assets`)
+4. **Front-end React:**
+   - React con layout sidebar, pannello versioning, routing base
+   - Nessuna autenticazione richiesta - accesso diretto all'applicazione
+   - Struttura consigliata (`components`, `services`, `assets`)
    - Stile custom (Claude.ai/GitHub Copilot)
 
 5. **Integrazione Ollama:**
    - Service JS/TS per chiamata API REST e generazione codice industriale
 
-6. **Versioning e Test:**
-   - VersionPanel React (stato Git real-time)
+6. **Versioning automatico con ai-bot:**
+   - Tutti i versioning e operazioni Git vengono gestiti automaticamente dall'utente ai-bot
+   - Nessuna configurazione OAuth richiesta
    - Configurazione Jest + React Testing Library
 
 ---

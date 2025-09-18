@@ -82,7 +82,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
         language: selectedLanguage,
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedModel, selectedLanguage, updateSession, currentSession?.id]);
 
   const generateMessageId = (): string => {

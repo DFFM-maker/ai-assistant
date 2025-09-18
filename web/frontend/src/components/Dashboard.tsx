@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User } from '../types/User';
 import { ollamaService } from '../services/ollamaService';
 import './Dashboard.css';
 
-interface DashboardProps {
-  user: User;
-}
-
-const Dashboard: React.FC<DashboardProps> = ({ user }) => {
+const Dashboard: React.FC = () => {
   const [ollamaStatus, setOllamaStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
   const [availableModels, setAvailableModels] = useState<string[]>([]);
 
@@ -36,7 +31,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     <div className="dashboard">
       <div className="dashboard-header">
         <h1>🏭 Industrial AI Assistant</h1>
-        <p>Welcome back, <strong>{user.name}</strong>!</p>
+        <p>Welcome to the AI Assistant!</p>
       </div>
 
       {/* Status Cards */}
@@ -69,13 +64,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
         <div className="status-card">
           <div className="status-header">
-            <h3>👤 User Session</h3>
+            <h3>🤖 AI Bot</h3>
             <div className="status-indicator connected">✅</div>
           </div>
           <div className="status-content">
-            <p>✅ Authenticated via GitLab</p>
-            <p>🔐 Session active</p>
-            <p>👤 @{user.username}</p>
+            <p>✅ Running as ai-bot</p>
+            <p>🔐 No authentication required</p>
+            <p>🤖 AI Assistant ready</p>
           </div>
         </div>
 
@@ -85,8 +80,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             <div className="status-indicator connected">✅</div>
           </div>
           <div className="status-content">
-            <p>✅ Git integration active</p>
-            <p>📊 Real-time status monitoring</p>
+            <p>✅ ai-bot Git integration active</p>
+            <p>📊 Automated versioning</p>
             <p>🚀 Auto-sync enabled</p>
           </div>
         </div>

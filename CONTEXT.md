@@ -28,7 +28,7 @@
 5. NPM esterno (192.168.1.252)
 6. PFSENSE (192.168.1.254) 
 7. Richieste:
-   OAuth su GitLab DFFM
+   Versioning automatico tramite ai-bot
 8. ho già allama e i modelli scaricati:
    aiuser@ai-assistant:~$ ollama list
    NAME                   ID              SIZE      MODIFIED
@@ -36,16 +36,11 @@
    magicoder:7b-s-cl      8007de06f5d9    3.8 GB    31 hours ago
    mistral:7b-instruct    6577803aa9a0    4.4 GB    31 hours ago
    deepseek-coder:6.7b    ce298d984115    3.8 GB    31 hours ago
-9. **Setup OAuth con GitLab DFFM**
-   - Backend Express ora integra autenticazione OAuth2 con GitLab DFFM su custom domain.
-   - File principale: `src/gitlabAuth.ts` (refactoring: usa dotenv, variabili da .env)
-   - Endpoints attivi:
-     - `/api/auth/gitlab` (avvia login OAuth)
-     - `/api/auth/gitlab/callback` (gestisce callback)
-     - `/api/auth/logout` (logout utente)
-     - `/api/user` (profilo utente + accessToken OAuth)
-   - Variabili sensitive in `/opt/ai-assistant/web/backend/.env`
-   - Testato: flusso login, token, profilazione utente.
+9. **Setup automatico ai-bot**
+   - Backend Express ora opera senza autenticazione OAuth
+   - Tutte le operazioni di versioning sono gestite automaticamente dall'utente ai-bot
+   - Endpoints rimossi: `/api/auth/gitlab`, `/api/auth/gitlab/callback`, `/api/auth/logout`, `/api/user`
+   - Configurazione semplificata senza variabili GitLab OAuth
 10. Boilerplate Frontend
     “Generami la skeleton app in React (o Vue, scegli tu) con:
     Layout a sidebar sinistra
@@ -70,7 +65,8 @@
     Come eseguire i test e avviare in dev/prod”
 16. Ottimizzazione delle richieste
     “Infine, dammi consigli su come tenere la chat ordinata: quando inviare blocchi di codice, come raggruppare i sotto-task e come usare un file CONTEXT.md per riassumere le dipendenze chiave.”
-17. **Stato attuale:**
-    - Backend Express con OAuth GitLab DFFM funzionante e pronto per integrazione frontend.
-    - Utente e token disponibili via `/api/user`.
-    - Prossimo step: avvio sviluppo frontend (React skeleton app).
+17. **Stato attuale (senza autenticazione):**
+    - Backend Express semplificato senza OAuth GitLab.
+    - Versioning completamente gestito da ai-bot.
+    - Frontend React funzionante senza login requirement.
+    - Applicazione pronta per utilizzo industriale.

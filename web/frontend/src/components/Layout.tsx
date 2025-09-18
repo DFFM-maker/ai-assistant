@@ -1,21 +1,15 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { User } from '../types/User';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import './Layout.css';
 
-interface LayoutProps {
-  user: User | null;
-  onLogout: () => Promise<void>;
-}
-
-const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
+const Layout: React.FC = () => {
   return (
     <div className="app-layout">
-      <Sidebar user={user} />
+      <Sidebar />
       <div className="content-area">
-        <Header user={user} onLogout={onLogout} />
+        <Header />
         <main className="main-content">
           <Outlet />
         </main>
