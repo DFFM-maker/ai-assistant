@@ -103,7 +103,7 @@ export class OllamaService {
   }
 
   /**
-   * Send a prompt to the Ollama API
+   * Send a prompt to the Ollama API with enhanced timeout handling and diagnostics
    */
   async sendMessage(
     model: string,
@@ -111,10 +111,26 @@ export class OllamaService {
     language: 'it' | 'en' = 'en',
     options?: OllamaRequest['options']
   ): Promise<OllamaResponse> {
+    const startTime = Date.now();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    
+    // Enhanced timeout with detailed logging
+    const timeoutId = setTimeout(() => {
+      const elapsedTime = Date.now() - startTime;
+      console.warn(`⏱️ Request timeout after ${elapsedTime}ms for model: ${model}`);
+      console.warn(`📊 Timeout details:`, {
+        model,
+        timeout: this.timeout,
+        baseUrl: this.baseUrl,
+        messageCount: messages.length,
+        elapsedTime
+      });
+      controller.abort();
+    }, this.timeout);
 
     try {
+      console.log(`🚀 Starting request to model: ${model} (timeout: ${this.timeout}ms)`);
+      
       // Add language context to system message if not already present
       const systemMessage = messages.find(m => m.role === 'system');
       const languageContext = language === 'it'
@@ -137,6 +153,13 @@ export class OllamaService {
         }
       };
 
+      console.log(`📤 Request payload:`, {
+        model,
+        messageCount: enhancedMessages.length,
+        options: requestData.options,
+        url: `${this.baseUrl}/api/chat`
+      });
+
       const response = await fetch(`${this.baseUrl}/api/chat`, {
         method: 'POST',
         headers: {
@@ -146,16 +169,50 @@ export class OllamaService {
         signal: controller.signal
       });
 
+      const responseTime = Date.now() - startTime;
+      console.log(`📥 Response received in ${responseTime}ms for model: ${model}`);
+
       if (!response.ok) {
-        throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
+        const errorText = await response.text().catch(() => 'Unknown error');
+        console.error(`❌ Ollama API error:`, {
+          status: response.status,
+          statusText: response.statusText,
+          model,
+          responseTime,
+          errorText
+        });
+        throw new Error(`Ollama API error: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const data: OllamaResponse = await response.json();
+      console.log(`✅ Request completed successfully:`, {
+        model,
+        responseTime,
+        totalDuration: data.total_duration,
+        evalCount: data.eval_count,
+        promptEvalCount: data.prompt_eval_count
+      });
+      
       return data;
     } catch (error) {
+      const elapsedTime = Date.now() - startTime;
+      
       if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('Request timeout - AI model took too long to respond');
+        console.error(`⏱️ Request timeout for model ${model} after ${elapsedTime}ms`);
+        const suggestedModel = this.getSuggestedModelForTimeout(model);
+        const timeoutMessage = language === 'it'
+          ? `Timeout del modello ${model} dopo ${elapsedTime}ms. Prova con un modello più veloce: ${suggestedModel}`
+          : `Timeout for model ${model} after ${elapsedTime}ms. Try a faster model: ${suggestedModel}`;
+        throw new Error(timeoutMessage);
       }
+      
+      console.error(`❌ Request failed for model ${model}:`, {
+        error: error instanceof Error ? error.message : error,
+        elapsedTime,
+        model,
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      
       throw error;
     } finally {
       clearTimeout(timeoutId);
@@ -163,37 +220,130 @@ export class OllamaService {
   }
 
   /**
-   * Check if Ollama service is available
+   * Suggest a faster model when timeout occurs
+   */
+  private getSuggestedModelForTimeout(currentModel: string): string {
+    // Map to faster alternatives based on current model
+    const fasterAlternatives: Record<string, string> = {
+      'llama2:13b-chat': 'magicoder:7b-s-cl',
+      'deepseek-coder:6.7b': 'magicoder:7b-s-cl',
+      'codellama:13b-instruct': 'magicoder:7b-s-cl',
+      'mistral:7b-instruct': 'magicoder:7b-s-cl'
+    };
+    
+    return fasterAlternatives[currentModel] || 'magicoder:7b-s-cl';
+  }
+
+  /**
+   * Check if Ollama service is available with enhanced diagnostics
    */
   async checkHealth(): Promise<boolean> {
+    const startTime = Date.now();
     try {
+      console.log(`🏥 Checking Ollama health at: ${this.baseUrl}`);
+      
+      // Use AbortController for timeout instead of timeout option
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
       const response = await fetch(`${this.baseUrl}/api/tags`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-        }
+        },
+        signal: controller.signal
       });
-      return response.ok;
-    } catch {
+      
+      clearTimeout(timeoutId);
+      const responseTime = Date.now() - startTime;
+      const isHealthy = response.ok;
+      
+      console.log(`🏥 Health check result:`, {
+        healthy: isHealthy,
+        responseTime,
+        status: response.status,
+        url: this.baseUrl
+      });
+      
+      return isHealthy;
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+      console.error(`❌ Health check failed:`, {
+        error: error instanceof Error ? error.message : error,
+        responseTime,
+        url: this.baseUrl
+      });
       return false;
     }
   }
 
   /**
-   * Get list of available models from Ollama
+   * Get list of available models with enhanced error handling
    */
   async getAvailableModels(): Promise<string[]> {
     try {
+      console.log(`📋 Fetching available models from: ${this.baseUrl}/api/tags`);
+      
       const response = await fetch(`${this.baseUrl}/api/tags`);
       if (!response.ok) {
+        console.error(`❌ Failed to fetch models:`, {
+          status: response.status,
+          statusText: response.statusText,
+          url: this.baseUrl
+        });
         throw new Error('Failed to fetch models');
       }
 
       const data = await response.json();
-      return data.models?.map((model: any) => model.name) || [];
+      const models = data.models?.map((model: any) => model.name) || [];
+      
+      console.log(`📋 Available models found:`, {
+        count: models.length,
+        models: models.slice(0, 5), // Log first 5 models
+        total: models.length
+      });
+      
+      return models;
     } catch (error) {
-      console.error('Error fetching available models:', error);
+      console.error('❌ Error fetching available models:', error);
       return [];
+    }
+  }
+
+  /**
+   * Diagnostic method to test model availability and performance
+   */
+  async diagnoseModel(modelName: string): Promise<{
+    available: boolean;
+    responseTime?: number;
+    error?: string;
+    suggestion?: string;
+  }> {
+    try {
+      console.log(`🔍 Diagnosing model: ${modelName}`);
+      
+      const startTime = Date.now();
+      const testMessage: OllamaMessage[] = [
+        { role: 'user', content: 'Hello, this is a test message.' }
+      ];
+      
+      await this.sendMessage(modelName, testMessage, 'en');
+      const responseTime = Date.now() - startTime;
+      
+      return {
+        available: true,
+        responseTime,
+        suggestion: responseTime > 15000 ? 'Consider using a faster model for better performance' : undefined
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`❌ Model diagnosis failed for ${modelName}:`, errorMessage);
+      
+      return {
+        available: false,
+        error: errorMessage,
+        suggestion: this.getSuggestedModelForTimeout(modelName)
+      };
     }
   }
 

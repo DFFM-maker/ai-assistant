@@ -3,7 +3,7 @@ import { OllamaMessage, ollamaService, INDUSTRIAL_MODELS, IndustrialAIModel } fr
 import { getRecommendedModelForQuery } from '../services/ollama_models';
 import { useChat } from '../hooks/useChat';
 import { ChatMessage as ChatMessageType } from '../types/Chat';
-import ModelSelector from './ModelSelector';
+import CompactModelSelector from './CompactModelSelector';
 import SidePanel from './SidePanel';
 import './ChatPanel.css';
 
@@ -207,7 +207,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
   return (
     <>
       <div className={`chat-panel ${className} ${isSidePanelOpen ? 'side-panel-open' : ''}`}>
-        {/* Enhanced Header */}
+        {/* Simplified Header - Removed Model Selector */}
         <div className="chat-header">
           <div className="chat-title">
             <h3>{currentSession.title}</h3>
@@ -230,14 +230,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
                 <option value="en">🇬🇧 English</option>
                 <option value="it">🇮🇹 Italiano</option>
               </select>
-            </div>
-            <div className="control-group model-selector-group">
-              <label>AI Model</label>
-              <ModelSelector
-                selectedModel={selectedModel}
-                onModelChange={setSelectedModel}
-                className="chat-model-selector"
-              />
             </div>
           </div>
         </div>
@@ -326,13 +318,20 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
               rows={1}
               disabled={!isConnected}
             />
-            <button
-              type="submit"
-              className="send-button"
-              disabled={!inputValue.trim() || isLoading || !isConnected}
-            >
-              {isLoading ? '⏳' : '📤'}
-            </button>
+            <div className="input-actions">
+              <CompactModelSelector
+                selectedModel={selectedModel}
+                onModelChange={setSelectedModel}
+                className="input-model-selector"
+              />
+              <button
+                type="submit"
+                className="send-button"
+                disabled={!inputValue.trim() || isLoading || !isConnected}
+              >
+                {isLoading ? '⏳' : '📤'}
+              </button>
+            </div>
           </div>
         </form>
       </div>

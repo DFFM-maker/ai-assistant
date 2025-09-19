@@ -201,36 +201,42 @@ export function getRecommendedModelForQuery(query: string): EnhancedOllamaModel 
   return findModelById('llama2-chat') || findModelById('mistral-instruct') || ENHANCED_OLLAMA_MODELS[0];
 }
 
-// Categories for UI grouping
+// Categories for UI grouping - Updated with performance tiers
 export const MODEL_CATEGORIES = {
   coding: {
     label: 'Coding & Development',
     icon: '💻',
-    description: 'Models specialized in code generation and programming'
+    description: 'Fast and cost-efficient',
+    tier: 'fast'
   },
   general: {
     label: 'General Purpose',
     icon: '🤖',
-    description: 'Versatile models for general conversations and tasks'
+    description: 'Versatile and highly intelligent',
+    tier: 'versatile'
   },
   automation: {
     label: 'Industrial Automation',
     icon: '🏭',
-    description: 'Specialized in industrial automation and control systems'
+    description: 'Most powerful at complex task',
+    tier: 'powerful'
   },
   plc: {
     label: 'PLC Programming',
     icon: '⚙️',
-    description: 'Expert in PLC programming and configuration'
+    description: 'Versatile and highly intelligent',
+    tier: 'versatile'
   },
   hmi: {
     label: 'HMI & SCADA',
     icon: '📊',
-    description: 'Human-Machine Interface and SCADA development'
+    description: 'Versatile and highly intelligent',
+    tier: 'versatile'
   },
   documentation: {
     label: 'Documentation',
     icon: '📚',
-    description: 'Technical writing and documentation generation'
+    description: 'Fast and cost-efficient',
+    tier: 'fast'
   }
 };
