@@ -5,6 +5,7 @@ export interface User {
   avatar: string;
   email?: string;
   accessToken?: string;
+  role?: 'admin' | 'user';
 }
 
 export interface UserContextType {
