@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './hooks/useTheme';
 import { ChatProvider } from './hooks/useChat';
@@ -6,19 +6,26 @@ import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import ChatPanel from './components/ChatPanel';
+import LoginWithGoogle from './components/LoginWithGoogle'; // <-- import
 import './styles/themes.css';
 import './styles.css';
 
 function App() {
+  const [role, setRole] = useState<'admin' | 'user' | 'unauthorized'>('unauthorized');
+
   return (
     <ThemeProvider>
       <ChatProvider>
         <Router>
+          {/* Mostra login/logout sempre in alto, fuori dalle route */}
+          <div style={{ position: 'fixed', top: 12, right: 24, zIndex: 1000 }}>
+            <LoginWithGoogle onRoleChange={setRole} />
+          </div>
           <Routes>
             <Route
               path="/"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute role={role}>
                   <Layout />
                 </ProtectedRoute>
               }
