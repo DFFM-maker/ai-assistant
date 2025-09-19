@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ollamaService } from '../services/ollamaService';
+import UserManagement from './UserManagement';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
   const [ollamaStatus, setOllamaStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
   const [availableModels, setAvailableModels] = useState<string[]>([]);
+  
+  // Simulate admin user - in a real app this would come from auth context
+  const [currentUser] = useState({
+    id: 'admin-1',
+    email: 'admin@ai-assistant.local',
+    name: 'AI Assistant Admin',
+    role: 'admin' as const
+  });
+
+  const isAdmin = currentUser.role === 'admin';
 
   useEffect(() => {
     checkOllamaStatus();
@@ -116,6 +127,13 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Admin Section - Only visible to admins */}
+      {isAdmin && (
+        <div className="admin-section">
+          <UserManagement />
+        </div>
+      )}
 
       {/* Recent Activity */}
       <div className="recent-activity">

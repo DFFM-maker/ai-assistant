@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { OllamaMessage, ollamaService, INDUSTRIAL_MODELS, IndustrialAIModel } from '../services/ollamaService';
-import { getRecommendedModelForQuery } from '../services/ollama_models';
+import { getRecommendedModelForQuery, ENHANCED_OLLAMA_MODELS } from '../services/ollama_models';
 import { useChat } from '../hooks/useChat';
 import { ChatMessage as ChatMessageType } from '../types/Chat';
 import CompactModelSelector from './CompactModelSelector';
@@ -20,6 +20,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
+  const [latestGeneratedCode, setLatestGeneratedCode] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -90,6 +91,24 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
     return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   };
 
+  // Function to detect code blocks in text
+  const detectCodeBlocks = (text: string): boolean => {
+    // Check for code block patterns: ```code```, `inline code`, or common programming keywords
+    const codeBlockPatterns = [
+      /```[\s\S]*?```/g,  // Multi-line code blocks
+      /`[^`\n]+`/g,       // Inline code blocks
+      /\b(function|class|def|import|export|const|let|var|if|for|while|return)\b/gi, // Programming keywords
+      /\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP)\b/gi, // SQL keywords
+      /\b(public|private|static|void|int|string|boolean|float|double)\b/gi, // Common data types
+      /<[^>]+>/g,         // HTML/XML tags
+      /\{[\s\S]*?\}/g,    // JSON-like objects
+      /\(\s*\)\s*=>/g,    // Arrow functions
+      /\#include|import\s+|from\s+/gi, // Include/import statements
+    ];
+    
+    return codeBlockPatterns.some(pattern => pattern.test(text));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading || !isConnected || !currentSession) {
@@ -135,15 +154,35 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
         language: selectedLanguage
       };
       addMessage(currentSession.id, aiMessage);
+      
+      // Auto-open side panel if the response contains code
+      if (detectCodeBlocks(response.message.content)) {
+        setLatestGeneratedCode(response.message.content);
+        setTimeout(() => {
+          setIsSidePanelOpen(true);
+        }, 500); // Small delay to let the message render first
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       let errorContent: string;
       
       if (error instanceof Error) {
         if (error.message.includes('timeout') || error.message.includes('Request timeout')) {
+          // Get current model info for speed recommendations
+          const currentModel = ENHANCED_OLLAMA_MODELS.find(m => m.ollama_model_name === selectedModel);
+          const fasterModels = ENHANCED_OLLAMA_MODELS.filter(m => 
+            m.recommended && 
+            m.ollama_model_name !== selectedModel &&
+            (m.size === '3.8GB' || m.size === '4.4GB') // Smaller, faster models
+          );
+          
+          const modelSuggestion = fasterModels.length > 0 
+            ? fasterModels.map(m => m.name).join(', ')
+            : 'Magicoder, DeepSeek Coder';
+            
           errorContent = selectedLanguage === 'it'
-            ? '⏱️ Timeout: Il modello AI ha impiegato troppo tempo per rispondere. Riprova con una richiesta più semplice.'
-            : '⏱️ Timeout: AI model took too long to respond. Try again with a simpler request.';
+            ? `⏱️ Timeout: Il modello ${currentModel?.name || selectedModel} ha impiegato troppo tempo per rispondere.\n\n💡 Suggerimento: Prova un modello più veloce come ${modelSuggestion} oppure riduci la complessità della richiesta.`
+            : `⏱️ Timeout: The ${currentModel?.name || selectedModel} model took too long to respond.\n\n💡 Suggestion: Try a faster model like ${modelSuggestion} or simplify your request.`;
         } else if (error.message.includes('ERR_NAME_NOT_RESOLVED') || error.message.includes('404')) {
           errorContent = selectedLanguage === 'it'
             ? '🔌 Errore di connessione: Impossibile raggiungere il servizio Ollama. Verifica che sia in esecuzione su localhost:11434'
@@ -352,37 +391,45 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
           targetBranch: "main"
         }}
         fileDiffs={[
+          // Add generated code as the first item if available
+          ...(latestGeneratedCode ? [{
+            path: "generated-code.txt",
+            status: "added" as const,
+            additions: latestGeneratedCode.split('\n').length,
+            deletions: 0,
+            patch: latestGeneratedCode
+          }] : []),
           {
             path: "web/frontend/src/components/ModelSelector.css",
-            status: "modified",
+            status: "modified" as const,
             additions: 15,
             deletions: 8,
             patch: "Enhanced model selector sizing and readability improvements"
           },
           {
             path: "web/frontend/src/components/ChatPanel.css",
-            status: "modified",
+            status: "modified" as const,
             additions: 25,
             deletions: 12,
             patch: "Copilot-style layout improvements with fixed input form"
           },
           {
             path: "web/frontend/src/components/SidePanel.tsx",
-            status: "added",
+            status: "added" as const,
             additions: 280,
             deletions: 0,
             patch: "New side panel component for PR and diff viewing"
           },
           {
             path: "web/frontend/src/components/Layout.tsx",
-            status: "modified",
+            status: "modified" as const,
             additions: 2,
             deletions: 5,
             patch: "Removed header component from layout"
           },
           {
             path: "web/frontend/public/favicon.svg",
-            status: "added",
+            status: "added" as const,
             additions: 20,
             deletions: 0,
             patch: "Added AI-themed SVG favicon"

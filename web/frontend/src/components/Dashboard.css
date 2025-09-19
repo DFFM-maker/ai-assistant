@@ -206,6 +206,11 @@
   color: var(--color-text-tertiary);
 }
 
+/* Admin Section */
+.admin-section {
+  margin-bottom: var(--spacing-2xl);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .dashboard-header h1 {
