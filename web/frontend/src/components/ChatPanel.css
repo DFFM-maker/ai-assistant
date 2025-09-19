@@ -1,12 +1,19 @@
+/* Copilot-style Chat Panel - Fixed Layout */
 .chat-panel {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh; /* Full viewport height */
   background-color: var(--color-chat-bg);
-  border-radius: var(--radius-lg);
+  border-radius: 0; /* Remove border radius for full area */
   overflow: hidden;
-  border: 1px solid var(--color-border-primary);
-  box-shadow: var(--shadow-sm);
+  border: none; /* Remove border for cleaner look */
+  box-shadow: none; /* Remove shadow for cleaner look */
+  position: relative;
+  transition: margin-right var(--transition-normal);
+}
+
+.chat-panel.side-panel-open {
+  margin-right: 450px; /* Width of side panel */
 }
 
 /* No session state */
@@ -164,13 +171,20 @@
 /* Removed Clear button and documentation shortcuts styles */
 
 /* Messages */
+/* Copilot-style Messages Container */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-xl);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
+  background-color: var(--color-bg-primary);
+  /* Ensure smooth scrolling */
+  scroll-behavior: smooth;
+  /* Better scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-secondary) var(--color-surface-variant);
 }
 
 .connection-warning {
@@ -330,36 +344,46 @@
 }
 
 /* Input Form */
+/* Copilot-style Fixed Input Form */
 .chat-input-form {
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-xl);
   border-top: 1px solid var(--color-border-primary);
   background-color: var(--color-surface);
+  flex-shrink: 0; /* Prevent shrinking */
+  position: sticky; /* Make it stick to bottom */
+  bottom: 0;
+  z-index: 10;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .input-container {
   display: flex;
   gap: var(--spacing-sm);
   align-items: end;
+  max-width: 800px; /* Limit width for better readability */
+  margin: 0 auto; /* Center the input */
 }
 
 .chat-input {
   flex: 1;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg); /* Increased padding */
   border: 1px solid var(--color-border-primary);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg); /* More rounded for modern look */
   background-color: var(--color-chat-input-bg);
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 15px; /* Slightly larger font */
   line-height: 1.4;
   resize: none;
-  min-height: 40px;
+  min-height: 48px; /* Increased minimum height */
   max-height: 120px;
   transition: all var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .chat-input:focus {
   outline: none;
   border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .chat-input::placeholder {
@@ -367,20 +391,20 @@
 }
 
 .send-button {
-  width: 40px;
-  height: 40px;
+  width: 48px; /* Slightly larger */
+  height: 48px; /* Match input height */
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg); /* Match input radius */
   background-color: var(--color-brand-primary);
   color: white;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   transition: all var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .send-button:hover:not(:disabled) {

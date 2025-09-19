@@ -86,9 +86,16 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
           <div className="model-info">
             <span className="model-name">{selectedModelData?.name || 'Select Model'}</span>
             {selectedModelData && (
-              <span className="model-category">
-                {MODEL_CATEGORIES[selectedModelData.categoria]?.icon} {MODEL_CATEGORIES[selectedModelData.categoria]?.label}
-              </span>
+              <>
+                <span className="model-category">
+                  {MODEL_CATEGORIES[selectedModelData.categoria]?.icon} {MODEL_CATEGORIES[selectedModelData.categoria]?.label}
+                </span>
+                {selectedModelData.ollama_model_name && (
+                  <span className="ollama-model-name">
+                    📦 {selectedModelData.ollama_model_name}
+                  </span>
+                )}
+              </>
             )}
           </div>
           {showAvailabilityStatus && selectedModelData && (
@@ -153,7 +160,12 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                         >
                           <div className="model-option-main">
                             <div className="model-option-header">
-                              <span className="model-option-name">{model.name}</span>
+                              <div className="model-main-info">
+                                <span className="model-option-name">{model.name}</span>
+                                {model.ollama_model_name && (
+                                  <span className="ollama-model-name">📦 {model.ollama_model_name}</span>
+                                )}
+                              </div>
                               <div className="model-badges">
                                 {model.recommended && <span className="badge recommended">⭐ Recommended</span>}
                                 {showAvailabilityStatus && (
