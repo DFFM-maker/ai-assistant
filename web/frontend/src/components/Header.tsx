@@ -1,34 +1,19 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User } from '../types/User';
 import { useTheme } from '../hooks/useTheme';
 import { useUserSettings } from '../hooks/useUserSettings';
 import './Header.css';
 
-interface HeaderProps {
-  user: User | null;
-  onLogout: () => Promise<void>;
-}
-
-const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
-  const navigate = useNavigate();
+const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { settings } = useUserSettings();
 
-  const handleLogout = async () => {
-    await onLogout();
-    navigate('/login');
-  };
-
   const getUserAvatar = () => {
-    return settings.avatar || user?.avatar || '';
+    return settings.avatar || 'https://via.placeholder.com/32/3b82f6/ffffff?text=AI';
   };
 
   const getUserName = () => {
-    return settings.name || user?.name || 'User';
+    return settings.name || 'AI Assistant';
   };
-
-  if (!user) return null;
 
   return (
     <header className="header">
@@ -48,16 +33,12 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
           
           <div className="user-info">
             <img
-              src={getUserAvatar() || 'https://via.placeholder.com/32/3b82f6/ffffff?text=U'}
+              src={getUserAvatar()}
               alt={`${getUserName()} avatar`}
               className="user-avatar"
             />
             <span className="user-name">{getUserName()}</span>
           </div>
-          
-          <button onClick={handleLogout} className="logout-button">
-            Logout
-          </button>
         </div>
       </div>
     </header>

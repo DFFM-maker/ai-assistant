@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { User } from "../types/User";
 import ChatList from "./ChatList";
 import Settings from "./Settings";
 import SettingsPanel from "./SettingsPanel";
@@ -9,11 +8,7 @@ import { useChat } from "../hooks/useChat";
 import { useUserSettings } from "../hooks/useUserSettings";
 import "./Sidebar.css";
 
-interface SidebarProps {
-  user?: User | null;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ user }) => {
+const Sidebar: React.FC = () => {
   const location = useLocation();
   const { switchSession } = useChat();
   const { settings } = useUserSettings();
@@ -34,15 +29,15 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
   };
 
   const getUserAvatar = () => {
-    return settings.avatar || user?.avatar || '';
+    return settings.avatar || 'https://via.placeholder.com/40/3b82f6/ffffff?text=AI';
   };
 
   const getUserName = () => {
-    return settings.name || user?.name || 'User';
+    return settings.name || 'AI Assistant';
   };
 
   const getUserEmail = () => {
-    return settings.email || user?.email || user?.username || '';
+    return settings.email || 'ai-bot@dffm.it';
   };
 
   const handleChatCreated = (sessionId: string) => {
@@ -128,40 +123,22 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
           </div>
         )}
         
-        {user && (
-          <div 
-            className="user-profile clickable" 
-            onClick={handleUserProfileClick}
-            title="Click to open user settings"
-          >
-            <img 
-              src={getUserAvatar() || 'https://via.placeholder.com/40/3b82f6/ffffff?text=U'} 
-              alt={getUserName()}
-              className="user-avatar"
-            />
-            <div className="user-details">
-              <div className="user-name">{getUserName()}</div>
-              <div className="user-username">{getUserEmail() ? getUserEmail() : `@${user.username}`}</div>
-            </div>
+        {/* AI Bot User Profile */}
+        <div 
+          className="user-profile clickable" 
+          onClick={handleUserProfileClick}
+          title="Click to open user settings"
+        >
+          <img 
+            src={getUserAvatar() || 'https://via.placeholder.com/40/3b82f6/ffffff?text=AI'} 
+            alt={getUserName()}
+            className="user-avatar"
+          />
+          <div className="user-details">
+            <div className="user-name">{getUserName()}</div>
+            <div className="user-username">{getUserEmail()}</div>
           </div>
-        )}
-        
-        {/* Logout Button */}
-        {user && (
-          <div className="logout-section">
-            <button 
-              className="logout-btn"
-              onClick={() => {
-                // Handle logout for GitLab authenticated users
-                window.location.href = '/api/auth/logout';
-              }}
-              title="Logout"
-            >
-              <span className="nav-icon">🚪</span>
-              <span className="nav-text">Logout</span>
-            </button>
-          </div>
-        )}
+        </div>
         
         <div className="app-version">
           <span>AI Assistant v1.0.0</span>
@@ -177,7 +154,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
       <SettingsPanel
         isOpen={showUserSettings}
         onClose={() => setShowUserSettings(false)}
-        user={user}
+        user={null}
       />
       
       <NewChatModal

@@ -5,22 +5,22 @@ import './SettingsPanel.css';
 interface SettingsPanelProps {
   isOpen: boolean;
   onClose: () => void;
-  user?: any; // Current authenticated user data
+  user?: any; // For compatibility - not used anymore
 }
 
-const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose, user }) => {
+const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
   const { settings, updateAvatar, updateEmail, updateName } = useUserSettings();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [localEmail, setLocalEmail] = useState(settings.email || user?.email || '');
-  const [localName, setLocalName] = useState(settings.name || user?.name || '');
+  const [localEmail, setLocalEmail] = useState(settings.email || '');
+  const [localName, setLocalName] = useState(settings.name || '');
   const [isUploading, setIsUploading] = useState(false);
 
-  // Sync local state when settings or user changes
+  // Sync local state when settings change
   React.useEffect(() => {
-    setLocalEmail(settings.email || user?.email || '');
-    setLocalName(settings.name || user?.name || '');
-  }, [settings, user]);
+    setLocalEmail(settings.email || '');
+    setLocalName(settings.name || '');
+  }, [settings]);
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -75,15 +75,15 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose, user }) 
   };
 
   const getCurrentAvatar = () => {
-    return previewImage || settings.avatar || user?.avatar || '';
+    return previewImage || settings.avatar || 'https://via.placeholder.com/80/3b82f6/ffffff?text=AI';
   };
 
   const getCurrentName = () => {
-    return settings.name || user?.name || 'User';
+    return settings.name || 'AI Assistant';
   };
 
   const getCurrentEmail = () => {
-    return settings.email || user?.email || '';
+    return settings.email || 'ai-bot@dffm.it';
   };
 
   if (!isOpen) return null;
@@ -181,7 +181,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose, user }) 
                   <button 
                     className="btn btn-primary btn-sm"
                     onClick={handleSaveName}
-                    disabled={localName.trim() === (settings.name || user?.name || '')}
+                    disabled={localName.trim() === (settings.name || '')}
                   >
                     Save
                   </button>
@@ -205,7 +205,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose, user }) 
                   <button 
                     className="btn btn-primary btn-sm"
                     onClick={handleSaveEmail}
-                    disabled={localEmail.trim() === (settings.email || user?.email || '')}
+                    disabled={localEmail.trim() === (settings.email || '')}
                   >
                     Save
                   </button>
@@ -236,21 +236,6 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose, user }) 
 
         <div className="settings-footer">
           <div className="footer-actions">
-            <button 
-              className="btn btn-danger logout-btn"
-              onClick={() => {
-                // Handle logout for demo users
-                if (localStorage.getItem('demo_user')) {
-                  localStorage.removeItem('demo_user');
-                  window.location.reload();
-                } else {
-                  // Handle logout for authenticated users
-                  window.location.href = 'http://192.168.1.250:4000/api/auth/logout';
-                }
-              }}
-            >
-              🚪 Logout
-            </button>
             <button className="btn btn-secondary" onClick={onClose}>
               Close
             </button>
