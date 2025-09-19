@@ -6,12 +6,14 @@ import SettingsPanel from "./SettingsPanel";
 import NewChatModal from "./NewChatModal";
 import { useChat } from "../hooks/useChat";
 import { useUserSettings } from "../hooks/useUserSettings";
+import { useTheme } from "../hooks/useTheme";
 import "./Sidebar.css";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const { switchSession } = useChat();
   const { settings } = useUserSettings();
+  const { theme, toggleTheme } = useTheme();
   const [showSettings, setShowSettings] = useState(false);
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [showNewChatModal, setShowNewChatModal] = useState(false);
@@ -122,6 +124,18 @@ const Sidebar: React.FC = () => {
             </button>
           </div>
         )}
+        
+        {/* Theme Toggle */}
+        <div className="sidebar-actions">
+          <button 
+            className="theme-toggle-btn"
+            onClick={toggleTheme}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            <span className="nav-icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
+            <span className="nav-text">{theme === 'dark' ? 'Light' : 'Dark'}</span>
+          </button>
+        </div>
         
         {/* AI Bot User Profile */}
         <div 

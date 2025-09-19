@@ -4,6 +4,7 @@ import { getRecommendedModelForQuery } from '../services/ollama_models';
 import { useChat } from '../hooks/useChat';
 import { ChatMessage as ChatMessageType } from '../types/Chat';
 import ModelSelector from './ModelSelector';
+import SidePanel from './SidePanel';
 import './ChatPanel.css';
 
 interface ChatPanelProps {
@@ -18,6 +19,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
   const [selectedLanguage, setSelectedLanguage] = useState<'it' | 'en'>('en');
   const [isConnected, setIsConnected] = useState(false);
   const [availableModels, setAvailableModels] = useState<string[]>([]);
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -135,12 +137,36 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
       addMessage(currentSession.id, aiMessage);
     } catch (error) {
       console.error('Error sending message:', error);
+      let errorContent: string;
+      
+      if (error instanceof Error) {
+        if (error.message.includes('timeout') || error.message.includes('Request timeout')) {
+          errorContent = selectedLanguage === 'it'
+            ? '⏱️ Timeout: Il modello AI ha impiegato troppo tempo per rispondere. Riprova con una richiesta più semplice.'
+            : '⏱️ Timeout: AI model took too long to respond. Try again with a simpler request.';
+        } else if (error.message.includes('ERR_NAME_NOT_RESOLVED') || error.message.includes('404')) {
+          errorContent = selectedLanguage === 'it'
+            ? '🔌 Errore di connessione: Impossibile raggiungere il servizio Ollama. Verifica che sia in esecuzione su localhost:11434'
+            : '🔌 Connection Error: Unable to reach Ollama service. Make sure it\'s running on localhost:11434';
+        } else if (error.message.includes('fetch')) {
+          errorContent = selectedLanguage === 'it'
+            ? '🌐 Errore di rete: Problema di connessione al servizio AI. Controlla la connessione internet.'
+            : '🌐 Network Error: Connection problem with AI service. Check your internet connection.';
+        } else {
+          errorContent = selectedLanguage === 'it'
+            ? `❌ Errore: ${error.message}`
+            : `❌ Error: ${error.message}`;
+        }
+      } else {
+        errorContent = selectedLanguage === 'it'
+          ? '❌ Errore sconosciuto durante l\'invio del messaggio'
+          : '❌ Unknown error occurred while sending message';
+      }
+      
       const errorMessage: ChatMessageType = {
         id: generateMessageId(),
         role: 'assistant',
-        content: selectedLanguage === 'it'
-          ? `Errore: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`
-          : `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        content: errorContent,
         timestamp: new Date(),
         model: selectedModel,
         language: selectedLanguage
@@ -179,136 +205,192 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
   }
 
   return (
-    <div className={`chat-panel ${className}`}>
-      {/* Enhanced Header */}
-      <div className="chat-header">
-        <div className="chat-title">
-          <h3>{currentSession.title}</h3>
-          <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
-            <span className="status-indicator"></span>
-            {isConnected
-              ? (selectedLanguage === 'it' ? 'Connesso' : 'Connected')
-              : (selectedLanguage === 'it' ? 'Disconnesso' : 'Disconnected')
-            }
-          </div>
-        </div>
-        <div className="chat-controls">
-          <div className="control-group">
-            <label>Language</label>
-            <select
-              value={selectedLanguage}
-              onChange={(e) => setSelectedLanguage(e.target.value as 'it' | 'en')}
-              className="language-selector"
-            >
-              <option value="en">🇬🇧 English</option>
-              <option value="it">🇮🇹 Italiano</option>
-            </select>
-          </div>
-          <div className="control-group model-selector-group">
-            <label>AI Model</label>
-            <ModelSelector
-              selectedModel={selectedModel}
-              onModelChange={setSelectedModel}
-              className="chat-model-selector"
-            />
-          </div>
-        </div>
-      </div>
-      <div className="chat-messages">
-        {!isConnected && (
-          <div className="connection-warning">
-            <div className="warning-content">
-              <span className="warning-icon">⚠️</span>
-              <p>
-                {selectedLanguage === 'it'
-                  ? '⚠️ Servizio Ollama non disponibile. Verifica che sia in esecuzione su localhost:11434'
-                  : '⚠️ Ollama service not available. Make sure it\'s running on localhost:11434'}
-              </p>
+    <>
+      <div className={`chat-panel ${className} ${isSidePanelOpen ? 'side-panel-open' : ''}`}>
+        {/* Enhanced Header */}
+        <div className="chat-header">
+          <div className="chat-title">
+            <h3>{currentSession.title}</h3>
+            <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
+              <span className="status-indicator"></span>
+              {isConnected
+                ? (selectedLanguage === 'it' ? 'Connesso' : 'Connected')
+                : (selectedLanguage === 'it' ? 'Disconnesso' : 'Disconnected')
+              }
             </div>
           </div>
-        )}
-        {currentSession.messages.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">🤖</div>
-            <h4>
-              {selectedLanguage === 'it' ? 'Inizia una conversazione' : 'Start a conversation'}
-            </h4>
-            <p>
-              {selectedLanguage === 'it'
-                ? 'Digita un messaggio qui sotto per iniziare a chattare con l\'AI Assistant industriale.'
-                : 'Type a message below to start chatting with the industrial AI Assistant.'}
-            </p>
+          <div className="chat-controls">
+            <div className="control-group">
+              <label>Language</label>
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value as 'it' | 'en')}
+                className="language-selector"
+              >
+                <option value="en">🇬🇧 English</option>
+                <option value="it">🇮🇹 Italiano</option>
+              </select>
+            </div>
+            <div className="control-group model-selector-group">
+              <label>AI Model</label>
+              <ModelSelector
+                selectedModel={selectedModel}
+                onModelChange={setSelectedModel}
+                className="chat-model-selector"
+              />
+            </div>
           </div>
-        ) : (
-          currentSession.messages.map((message) => (
-            <div key={message.id} className={`message ${message.role}`}>
+        </div>
+        <div className="chat-messages">
+          {!isConnected && (
+            <div className="connection-warning">
+              <div className="warning-content">
+                <span className="warning-icon">⚠️</span>
+                <p>
+                  {selectedLanguage === 'it'
+                    ? '⚠️ Servizio Ollama non disponibile. Verifica che sia in esecuzione su localhost:11434'
+                    : '⚠️ Ollama service not available. Make sure it\'s running on localhost:11434'}
+                </p>
+              </div>
+            </div>
+          )}
+          {currentSession.messages.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">🤖</div>
+              <h4>
+                {selectedLanguage === 'it' ? 'Inizia una conversazione' : 'Start a conversation'}
+              </h4>
+              <p>
+                {selectedLanguage === 'it'
+                  ? 'Digita un messaggio qui sotto per iniziare a chattare con l\'AI Assistant industriale.'
+                  : 'Type a message below to start chatting with the industrial AI Assistant.'}
+              </p>
+            </div>
+          ) : (
+            currentSession.messages.map((message) => (
+              <div key={message.id} className={`message ${message.role}`}>
+                <div className="message-header">
+                  <span className="message-role">
+                    {message.role === 'user' ? '👤' : '🤖'}
+                    {message.role === 'user'
+                      ? (selectedLanguage === 'it' ? 'Tu' : 'You')
+                      : getIndustrialModel(message.model || '')?.name || 'AI Assistant'
+                    }
+                  </span>
+                  <span className="message-timestamp">
+                    {formatTimestamp(new Date(message.timestamp))}
+                  </span>
+                </div>
+                <div className="message-content">
+                  {message.content.split('\n').map((line, index) => (
+                    <React.Fragment key={index}>
+                      {line}
+                      {index < message.content.split('\n').length - 1 && <br />}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+          {isLoading && (
+            <div className="message loading">
               <div className="message-header">
                 <span className="message-role">
-                  {message.role === 'user' ? '👤' : '🤖'}
-                  {message.role === 'user'
-                    ? (selectedLanguage === 'it' ? 'Tu' : 'You')
-                    : getIndustrialModel(message.model || '')?.name || 'AI Assistant'
-                  }
-                </span>
-                <span className="message-timestamp">
-                  {formatTimestamp(new Date(message.timestamp))}
+                  🤖 {getIndustrialModel(selectedModel)?.name || 'AI Assistant'}
                 </span>
               </div>
               <div className="message-content">
-                {message.content.split('\n').map((line, index) => (
-                  <React.Fragment key={index}>
-                    {line}
-                    {index < message.content.split('\n').length - 1 && <br />}
-                  </React.Fragment>
-                ))}
+                <div className="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
               </div>
             </div>
-          ))
-        )}
-        {isLoading && (
-          <div className="message loading">
-            <div className="message-header">
-              <span className="message-role">
-                🤖 {getIndustrialModel(selectedModel)?.name || 'AI Assistant'}
-              </span>
-            </div>
-            <div className="message-content">
-              <div className="typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-      <form onSubmit={handleSubmit} className="chat-input-form">
-        <div className="input-container">
-          <textarea
-            ref={inputRef}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={
-              selectedLanguage === 'it'
-                ? 'Scrivi il tuo messaggio... (Enter per inviare, Shift+Enter per nuova riga)'
-                : 'Type your message... (Enter to send, Shift+Enter for new line)'
-            }
-            className="chat-input"
-            rows={1}
-            disabled={!isConnected}
-          />
-          <button
-            type="submit"
-            className="send-button"
-            disabled={!inputValue.trim() || isLoading || !isConnected}
-          >
-            {isLoading ? '⏳' : '📤'}
-          </button>
+          )}
+          <div ref={messagesEndRef} />
         </div>
-      </form>
-    </div>
+        <form onSubmit={handleSubmit} className="chat-input-form">
+          <div className="input-container">
+            <textarea
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={
+                selectedLanguage === 'it'
+                  ? 'Scrivi il tuo messaggio... (Enter per inviare, Shift+Enter per nuova riga)'
+                  : 'Type your message... (Enter to send, Shift+Enter for new line)'
+              }
+              className="chat-input"
+              rows={1}
+              disabled={!isConnected}
+            />
+            <button
+              type="submit"
+              className="send-button"
+              disabled={!inputValue.trim() || isLoading || !isConnected}
+            >
+              {isLoading ? '⏳' : '📤'}
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      {/* Side Panel for Version Control */}
+      <SidePanel
+        isOpen={isSidePanelOpen}
+        onClose={() => setIsSidePanelOpen(false)}
+        onToggle={() => setIsSidePanelOpen(!isSidePanelOpen)}
+        prDetails={{
+          title: "Frontend Refactoring PR",
+          description: "Miglioramento dropdown modelli AI, rimozione barra superiore, implementazione chat stile Copilot, gestione errori migliorata, e aggiunta SidePanel per versioning.",
+          status: "draft",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          author: "AI Assistant",
+          branch: "copilot/frontend-refactoring",
+          targetBranch: "main"
+        }}
+        fileDiffs={[
+          {
+            path: "web/frontend/src/components/ModelSelector.css",
+            status: "modified",
+            additions: 15,
+            deletions: 8,
+            patch: "Enhanced model selector sizing and readability improvements"
+          },
+          {
+            path: "web/frontend/src/components/ChatPanel.css",
+            status: "modified",
+            additions: 25,
+            deletions: 12,
+            patch: "Copilot-style layout improvements with fixed input form"
+          },
+          {
+            path: "web/frontend/src/components/SidePanel.tsx",
+            status: "added",
+            additions: 280,
+            deletions: 0,
+            patch: "New side panel component for PR and diff viewing"
+          },
+          {
+            path: "web/frontend/src/components/Layout.tsx",
+            status: "modified",
+            additions: 2,
+            deletions: 5,
+            patch: "Removed header component from layout"
+          },
+          {
+            path: "web/frontend/public/favicon.svg",
+            status: "added",
+            additions: 20,
+            deletions: 0,
+            patch: "Added AI-themed SVG favicon"
+          }
+        ]}
+      />
+    </>
   );
 };
 

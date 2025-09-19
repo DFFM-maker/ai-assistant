@@ -141,6 +141,26 @@
   color: var(--color-text-primary);
 }
 
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: none;
+  background-color: transparent;
+  color: var(--color-sidebar-text);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 14px;
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--color-sidebar-hover);
+  color: var(--color-text-primary);
+}
+
 .user-profile {
   display: flex;
   align-items: center;
@@ -234,6 +254,7 @@
   }
   
   .settings-btn,
+  .theme-toggle-btn,
   .logout-btn {
     justify-content: center;
   }
