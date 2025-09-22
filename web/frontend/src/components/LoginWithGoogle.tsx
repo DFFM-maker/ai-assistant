@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 // In alternativa, usa la tua soluzione custom per il login Google!
 import { signInWithPopup, signOut, User } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
-import UserManagement from './UserManagement';
 
 // Whitelist admin
 const ADMIN_EMAILS = [
@@ -65,11 +64,16 @@ const LoginWithGoogle: React.FC<LoginWithGoogleProps> = ({ onRoleChange }) => {
         );
     };
 
-    // Login Google
+    // Login Google (temporary mock for testing)
     const handleLogin = async () => {
         try {
-            const result = await signInWithPopup(auth, googleProvider);
-            setUser(result.user);
+            // Mock admin user for testing
+            const mockUser = {
+                displayName: "Admin User",
+                email: "admin@ai-assistant.local",
+                uid: "mock-admin-uid"
+            } as User;
+            setUser(mockUser);
         } catch (err) {
             alert("Errore login Google!");
         }
@@ -103,13 +107,6 @@ const LoginWithGoogle: React.FC<LoginWithGoogleProps> = ({ onRoleChange }) => {
                 <div style={{ color: "red", marginTop: 12 }}>
                     La tua email non è autorizzata.<br />Contatta un amministratore.
                 </div>
-            )}
-
-            {role === 'admin' && (
-                <UserManagement
-                    // Puoi passare props alla tua UserManagement!
-                    className="admin-panel"
-                />
             )}
         </div>
     );

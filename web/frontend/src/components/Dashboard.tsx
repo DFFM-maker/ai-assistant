@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ollamaService } from '../services/ollamaService';
-import UserManagement from './UserManagement';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -127,13 +126,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Admin Section - Only visible to admins */}
-      {isAdmin && (
-        <div className="admin-section">
-          <UserManagement />
-        </div>
-      )}
 
       {/* Recent Activity */}
       <div className="recent-activity">

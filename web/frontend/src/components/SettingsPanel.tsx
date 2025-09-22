@@ -1,14 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { useUserSettings } from '../hooks/useUserSettings';
+import UserManagement from './UserManagement';
 import './SettingsPanel.css';
 
 interface SettingsPanelProps {
   isOpen: boolean;
   onClose: () => void;
   user?: any; // For compatibility - not used anymore
+  currentUserRole?: 'admin' | 'user' | 'unauthorized'; // Add role prop
 }
 
-const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
+const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose, currentUserRole = 'user' }) => {
   const { settings, updateAvatar, updateEmail, updateName } = useUserSettings();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -232,6 +234,16 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
               </ul>
             </div>
           </div>
+
+          {/* Admin Only: User Management Section */}
+          {currentUserRole === 'admin' && (
+            <div className="section">
+              <div className="section-header">
+                <h3>👥 User Management</h3>
+              </div>
+              <UserManagement className="settings-user-management" />
+            </div>
+          )}
         </div>
 
         <div className="settings-footer">

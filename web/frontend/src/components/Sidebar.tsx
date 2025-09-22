@@ -7,6 +7,7 @@ import NewChatModal from "./NewChatModal";
 import { useChat } from "../hooks/useChat";
 import { useUserSettings } from "../hooks/useUserSettings";
 import { useTheme } from "../hooks/useTheme";
+import { useUserRole } from "../hooks/useUserRole";
 import "./Sidebar.css";
 
 const Sidebar: React.FC = () => {
@@ -14,6 +15,7 @@ const Sidebar: React.FC = () => {
   const { switchSession } = useChat();
   const { settings } = useUserSettings();
   const { theme, toggleTheme } = useTheme();
+  const { role } = useUserRole();
   const [showSettings, setShowSettings] = useState(false);
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [showNewChatModal, setShowNewChatModal] = useState(false);
@@ -168,7 +170,7 @@ const Sidebar: React.FC = () => {
       <SettingsPanel
         isOpen={showUserSettings}
         onClose={() => setShowUserSettings(false)}
-        user={null}
+        currentUserRole={role}
       />
 
       <NewChatModal
