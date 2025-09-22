@@ -70,8 +70,8 @@ const Sidebar: React.FC = () => {
           <nav className="sidebar-nav">
             <ul className="nav-list">
               <li className="nav-item">
-                <Link 
-                  to="/dashboard" 
+                <Link
+                  to="/dashboard"
                   className={`nav-link ${isActive('/dashboard') || isActive('/') ? 'active' : ''}`}
                 >
                   <span className="nav-icon">🏠</span>
@@ -79,8 +79,8 @@ const Sidebar: React.FC = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link 
-                  to="/chat" 
+                <Link
+                  to="/chat"
                   className={`nav-link ${isActive('/chat') ? 'active' : ''}`}
                 >
                   <span className="nav-icon">🤖</span>
@@ -88,8 +88,8 @@ const Sidebar: React.FC = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link 
-                  to="/versioning" 
+                <Link
+                  to="/versioning"
                   className={`nav-link ${isActive('/versioning') ? 'active' : ''}`}
                 >
                   <span className="nav-icon">🔧</span>
@@ -97,8 +97,8 @@ const Sidebar: React.FC = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link 
-                  to="/documentation" 
+                <Link
+                  to="/documentation"
                   className={`nav-link ${isActive('/documentation') ? 'active' : ''}`}
                 >
                   <span className="nav-icon">📚</span>
@@ -109,12 +109,12 @@ const Sidebar: React.FC = () => {
           </nav>
         )}
       </div>
-      
+
       {/* Footer with Settings and User Profile */}
       <div className="sidebar-footer">
         {isChatPage && (
           <div className="sidebar-actions">
-            <button 
+            <button
               className="settings-btn"
               onClick={() => setShowSettings(true)}
               title="Manage Groups"
@@ -124,10 +124,10 @@ const Sidebar: React.FC = () => {
             </button>
           </div>
         )}
-        
+
         {/* Theme Toggle */}
         <div className="sidebar-actions">
-          <button 
+          <button
             className="theme-toggle-btn"
             onClick={toggleTheme}
             title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
@@ -136,15 +136,15 @@ const Sidebar: React.FC = () => {
             <span className="nav-text">{theme === 'dark' ? 'Light' : 'Dark'}</span>
           </button>
         </div>
-        
+
         {/* AI Bot User Profile */}
-        <div 
-          className="user-profile clickable" 
+        <div
+          className="user-profile clickable"
           onClick={handleUserProfileClick}
           title="Click to open user settings"
         >
-          <img 
-            src={getUserAvatar() || 'https://via.placeholder.com/40/3b82f6/ffffff?text=AI'} 
+          <img
+            src={getUserAvatar() || 'https://via.placeholder.com/40/3b82f6/ffffff?text=AI'}
             alt={getUserName()}
             className="user-avatar"
           />
@@ -153,24 +153,24 @@ const Sidebar: React.FC = () => {
             <div className="user-username">{getUserEmail()}</div>
           </div>
         </div>
-        
+
         <div className="app-version">
           <span>AI Assistant v1.0.0</span>
         </div>
       </div>
 
       {/* Modals */}
-      <Settings 
-        isOpen={showSettings} 
-        onClose={() => setShowSettings(false)} 
+      <Settings
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
       />
-      
+
       <SettingsPanel
         isOpen={showUserSettings}
         onClose={() => setShowUserSettings(false)}
         user={null}
       />
-      
+
       <NewChatModal
         isOpen={showNewChatModal}
         onClose={() => setShowNewChatModal(false)}
@@ -181,4 +181,3 @@ const Sidebar: React.FC = () => {
 };
 
 export default Sidebar;
-

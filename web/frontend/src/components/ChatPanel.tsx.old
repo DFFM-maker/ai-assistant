@@ -11,9 +11,6 @@ interface ChatPanelProps {
   className?: string;
 }
 
-// WebSocket endpoint
-const WEBSOCKET_URL = 'wss://ai-assistant.dffm.it/ws';
-
 const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
   const { currentSession, addMessage, updateSession } = useChat();
   const [inputValue, setInputValue] = useState('');
@@ -26,9 +23,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
   const [latestGeneratedCode, setLatestGeneratedCode] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  // WebSocket ref
-  const wsRef = useRef<WebSocket | null>(null);
 
   // Allinea model/language solo quando cambia la sessione!
   useEffect(() => {
@@ -67,64 +61,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [currentSession?.messages]);
-
-  // WebSocket connection setup
-  useEffect(() => {
-    // Solo se la sessione è presente
-    if (!currentSession) return;
-
-    const ws = new WebSocket(WEBSOCKET_URL);
-
-    ws.onopen = () => {
-      console.log('WebSocket connected');
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        // Gestione risposta dal backend via WebSocket
-        const data = JSON.parse(event.data);
-
-        if (data.type === 'ollama_response') {
-          const aiMessage: ChatMessageType = {
-            id: generateMessageId(),
-            role: 'assistant',
-            content: data.content,
-            timestamp: new Date(),
-            model: data.model,
-            language: selectedLanguage
-          };
-          addMessage(currentSession.id, aiMessage);
-
-          if (detectCodeBlocks(data.content)) {
-            setLatestGeneratedCode(data.content);
-            setTimeout(() => {
-              setIsSidePanelOpen(true);
-            }, 500);
-          }
-          setIsLoading(false);
-        }
-      } catch (err) {
-        console.error('WebSocket message error', err);
-        setIsLoading(false);
-      }
-    };
-
-    ws.onerror = (err) => {
-      console.error('WebSocket error', err);
-      setIsLoading(false);
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket disconnected');
-    };
-
-    wsRef.current = ws;
-
-    return () => {
-      ws.close();
-    };
-    // eslint-disable-next-line
-  }, [currentSession?.id, selectedLanguage, addMessage]);
 
   // Aggiorna sessione SOLO quando l’utente seleziona un nuovo modello
   const handleModelChange = (model: string) => {
@@ -186,20 +122,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ className = '' }) => {
     setInputValue('');
     setIsLoading(true);
 
-    // INVIA MESSAGGIO VIA WEBSOCKET SE DISPONIBILE
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
-        type: 'ollama_request',
-        content: userMessage.content,
-        model: modelToUse,
-        language: selectedLanguage,
-        sessionId: currentSession.id,
-      }));
-      // Gestione risposta via onmessage WebSocket
-      return;
-    }
-
-    // Fallback: chiamata REST
     try {
       const conversationMessages: OllamaMessage[] = currentSession.messages
         .slice(-10)

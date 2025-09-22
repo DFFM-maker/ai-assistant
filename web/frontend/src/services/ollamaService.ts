@@ -1,3 +1,14 @@
+const OLLAMA_BASE_URL = process.env.REACT_APP_OLLAMA_API_URL;
+
+export async function sendOllamaMessage(data: any) {
+  const res = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
 import {
   ENHANCED_OLLAMA_MODELS,
   EnhancedOllamaModel,
@@ -97,10 +108,14 @@ export class OllamaService {
   private baseUrl: string;
   private timeout: number;
 
-  constructor(baseUrl: string = 'http://192.168.1.250:11434', timeout: number = 30000) {
+  // PATCH: usa la variabile .env!
+  constructor(baseUrl: string = process.env.REACT_APP_OLLAMA_API_URL || 'http://192.168.1.250:11434', timeout: number = 300000) {
     this.baseUrl = baseUrl;
     this.timeout = timeout;
   }
+
+
+
 
   /**
    * Send a prompt to the Ollama API with enhanced timeout handling and diagnostics
@@ -113,7 +128,7 @@ export class OllamaService {
   ): Promise<OllamaResponse> {
     const startTime = Date.now();
     const controller = new AbortController();
-    
+
     // Enhanced timeout with detailed logging
     const timeoutId = setTimeout(() => {
       const elapsedTime = Date.now() - startTime;
@@ -130,7 +145,7 @@ export class OllamaService {
 
     try {
       console.log(`🚀 Starting request to model: ${model} (timeout: ${this.timeout}ms)`);
-      
+
       // Add language context to system message if not already present
       const systemMessage = messages.find(m => m.role === 'system');
       const languageContext = language === 'it'
@@ -192,11 +207,11 @@ export class OllamaService {
         evalCount: data.eval_count,
         promptEvalCount: data.prompt_eval_count
       });
-      
+
       return data;
     } catch (error) {
       const elapsedTime = Date.now() - startTime;
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         console.error(`⏱️ Request timeout for model ${model} after ${elapsedTime}ms`);
         const suggestedModel = this.getSuggestedModelForTimeout(model);
@@ -205,14 +220,14 @@ export class OllamaService {
           : `Timeout for model ${model} after ${elapsedTime}ms. Try a faster model: ${suggestedModel}`;
         throw new Error(timeoutMessage);
       }
-      
+
       console.error(`❌ Request failed for model ${model}:`, {
         error: error instanceof Error ? error.message : error,
         elapsedTime,
         model,
         stack: error instanceof Error ? error.stack : undefined
       });
-      
+
       throw error;
     } finally {
       clearTimeout(timeoutId);
@@ -230,7 +245,7 @@ export class OllamaService {
       'codellama:13b-instruct': 'magicoder:7b-s-cl',
       'mistral:7b-instruct': 'magicoder:7b-s-cl'
     };
-    
+
     return fasterAlternatives[currentModel] || 'magicoder:7b-s-cl';
   }
 
@@ -241,11 +256,11 @@ export class OllamaService {
     const startTime = Date.now();
     try {
       console.log(`🏥 Checking Ollama health at: ${this.baseUrl}`);
-      
+
       // Use AbortController for timeout instead of timeout option
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
+
       const response = await fetch(`${this.baseUrl}/api/tags`, {
         method: 'GET',
         headers: {
@@ -253,18 +268,18 @@ export class OllamaService {
         },
         signal: controller.signal
       });
-      
+
       clearTimeout(timeoutId);
       const responseTime = Date.now() - startTime;
       const isHealthy = response.ok;
-      
+
       console.log(`🏥 Health check result:`, {
         healthy: isHealthy,
         responseTime,
         status: response.status,
         url: this.baseUrl
       });
-      
+
       return isHealthy;
     } catch (error) {
       const responseTime = Date.now() - startTime;
@@ -283,7 +298,7 @@ export class OllamaService {
   async getAvailableModels(): Promise<string[]> {
     try {
       console.log(`📋 Fetching available models from: ${this.baseUrl}/api/tags`);
-      
+
       const response = await fetch(`${this.baseUrl}/api/tags`);
       if (!response.ok) {
         console.error(`❌ Failed to fetch models:`, {
@@ -296,13 +311,13 @@ export class OllamaService {
 
       const data = await response.json();
       const models = data.models?.map((model: any) => model.name) || [];
-      
+
       console.log(`📋 Available models found:`, {
         count: models.length,
         models: models.slice(0, 5), // Log first 5 models
         total: models.length
       });
-      
+
       return models;
     } catch (error) {
       console.error('❌ Error fetching available models:', error);
@@ -321,15 +336,15 @@ export class OllamaService {
   }> {
     try {
       console.log(`🔍 Diagnosing model: ${modelName}`);
-      
+
       const startTime = Date.now();
       const testMessage: OllamaMessage[] = [
         { role: 'user', content: 'Hello, this is a test message.' }
       ];
-      
+
       await this.sendMessage(modelName, testMessage, 'en');
       const responseTime = Date.now() - startTime;
-      
+
       return {
         available: true,
         responseTime,
@@ -338,7 +353,7 @@ export class OllamaService {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error(`❌ Model diagnosis failed for ${modelName}:`, errorMessage);
-      
+
       return {
         available: false,
         error: errorMessage,

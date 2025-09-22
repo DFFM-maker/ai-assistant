@@ -148,7 +148,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
                       ➖ {fileDiffs.reduce((sum, f) => sum + f.deletions, 0)} deletions
                     </span>
                   </div>
-
+                  
                   <div className="files-list">
                     {fileDiffs.map((file, index) => {
                       const status = formatFileStatus(file.status);
@@ -209,7 +209,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
                       </button>
                     </div>
                   </div>
-
+                  
                   <div className="diff-content">
                     {selectedFile.patch ? (
                       <pre className="diff-patch">{selectedFile.patch}</pre>
@@ -232,7 +232,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
                           {prDetails.status.toUpperCase()}
                         </span>
                       </div>
-
+                      
                       <div className="pr-meta">
                         <div className="meta-item">
                           <span className="meta-label">Author:</span>
@@ -251,7 +251,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
                           <span className="meta-value">🕒 {formatDate(prDetails.updatedAt)}</span>
                         </div>
                       </div>
-
+                      
                       <div className="pr-description">
                         <h5>Description</h5>
                         <div className="description-content">

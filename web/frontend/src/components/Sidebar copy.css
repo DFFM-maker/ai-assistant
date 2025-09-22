@@ -5,8 +5,7 @@
   height: 100vh;
   position: fixed;
   left: 0;
-  top: 0;
-  /* Remove header offset for full height */
+  top: 0; /* Remove header offset for full height */
   border-right: 1px solid var(--color-border-primary);
   display: flex;
   flex-direction: column;
@@ -233,33 +232,33 @@
   .sidebar {
     width: 60px;
   }
-
+  
   .sidebar-header {
     padding: var(--spacing-sm);
   }
-
+  
   .app-name,
   .nav-text,
   .user-details,
   .app-version {
     display: none;
   }
-
+  
   .nav-link {
     justify-content: center;
     padding: var(--spacing-sm);
   }
-
+  
   .app-logo-section {
     justify-content: center;
   }
-
+  
   .settings-btn,
   .theme-toggle-btn,
   .logout-btn {
     justify-content: center;
   }
-
+  
   .user-profile {
     justify-content: center;
     padding: var(--spacing-xs);
