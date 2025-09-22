@@ -12,8 +12,7 @@ import './styles/themes.css';
 import './styles.css';
 
 function App() {
-  // Temporarily set to admin for testing
-  const [role, setRole] = useState<'admin' | 'user' | 'unauthorized'>('admin');
+  const [role, setRole] = useState<'admin' | 'user' | 'unauthorized'>('unauthorized');
 
   return (
     <ThemeProvider>

@@ -64,16 +64,11 @@ const LoginWithGoogle: React.FC<LoginWithGoogleProps> = ({ onRoleChange }) => {
         );
     };
 
-    // Login Google (temporary mock for testing)
+    // Login Google
     const handleLogin = async () => {
         try {
-            // Mock admin user for testing
-            const mockUser = {
-                displayName: "Admin User",
-                email: "admin@ai-assistant.local",
-                uid: "mock-admin-uid"
-            } as User;
-            setUser(mockUser);
+            const result = await signInWithPopup(auth, googleProvider);
+            setUser(result.user);
         } catch (err) {
             alert("Errore login Google!");
         }

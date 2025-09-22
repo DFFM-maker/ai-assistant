@@ -75,7 +75,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
         onClick={onToggle}
         title="Open Version Control Panel"
       >
-        <span className="toggle-icon">📊</span>
+        <span className="toggle-icon">📈</span>
         <span className="toggle-text">PR Details</span>
       </button>
     );

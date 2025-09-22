@@ -2,22 +2,23 @@
 .side-panel-toggle {
   position: fixed;
   right: 20px;
-  top: 20px;
+  top: 80px; /* Moved down to avoid login button conflict */
   background: var(--color-brand-primary);
   color: white;
   border: none;
   border-radius: var(--radius-md);
-  padding: 8px 12px;
+  padding: 10px 16px; /* Slightly larger padding for better visibility */
   cursor: pointer;
   box-shadow: var(--shadow-lg);
   transition: all var(--transition-fast);
-  z-index: 999;
+  z-index: 998; /* Slightly lower than login but still visible */
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: auto;
   writing-mode: initial;
   text-orientation: initial;
+  font-weight: 600; /* Make it more prominent */
 }
 
 .side-panel-toggle:hover {
